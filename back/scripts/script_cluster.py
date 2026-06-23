@@ -19,8 +19,8 @@ def main():
         sys.exit(1)
 
     # 2. Chargement du modèle de clustering
-    # Adapte le nom du fichier pkl selon ton projet
-    model_path = os.path.join(os.path.dirname(__file__), "model_kmeans.pkl")
+    
+    model_path = os.path.join(os.path.dirname(__file__), "modele_kmeans.pkl")
     
     if not os.path.exists(model_path):
         print(json.dumps({"error": f"Modèle introuvable à l'emplacement: {model_path}"}), file=sys.stderr)
@@ -34,9 +34,6 @@ def main():
 
     # 3. Conversion en DataFrame pour traitement vectorisé
     df = pd.DataFrame(points)
-    
-    # Assurons-nous d'extraire les colonnes dans le bon ordre requis par ton modèle
-    # (Par exemple, si ton modèle a été entraîné sur ['latitude', 'longitude'])
     X = df[['latitude', 'longitude']].astype(float)
 
     # 4. Inférence en lot (Batch prediction) - Prend quelques millisecondes pour 3915 lignes
