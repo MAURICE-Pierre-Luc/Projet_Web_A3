@@ -18,9 +18,10 @@ def main():
         print(json.dumps({"error": f"Erreur décodage JSON d'entrée: {str(e)}"}))
         sys.exit(1)
 
-    # 2. Chargement du modèle de clustering
+    # 2. Chargement du modèle de clustering et du scaler
     
     model_path = os.path.join(os.path.dirname(__file__), "modele_kmeans.pkl")
+    scaler_path = os.path.join(os.path.dirname(__file__), "scaler_kmeans.pkl")
     
     if not os.path.exists(model_path):
         print(json.dumps({"error": f"Modèle introuvable à l'emplacement: {model_path}"}), file=sys.stderr)
@@ -28,8 +29,9 @@ def main():
         
     try :
         kmeans_model = joblib.load(model_path)
+        scaler = joblib.load(scaler_path)
     except Exception as e:
-        print(json.dumps({"error": f"Erreur lors du chargement du fichier pkl: {str(e)}"}), file=sys.stderr)
+        print(json.dumps({"error": f"Erreur lors du chargement des fichier pkl: {str(e)}"}), file=sys.stderr)
         sys.exit(1)
 
     # 3. Conversion en DataFrame pour traitement vectorisé
@@ -38,6 +40,7 @@ def main():
 
     # 4. Inférence en lot (Batch prediction) - Prend quelques millisecondes pour 3915 lignes
     try :
+        X_scaled = scaler.transform(X)
         predictions = kmeans_model.predict(X)
         # On ajoute les prédictions comme une nouvelle clé dans nos dictionnaires d'origine
         for i, point in enumerate(points):
