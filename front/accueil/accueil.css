@@ -115,8 +115,6 @@ body {
   display: flex;
   gap: 16px;
   width: 100%;
-  max-width: 1100px;
-  margin: 0 auto;
   align-items: stretch;
 }
 
