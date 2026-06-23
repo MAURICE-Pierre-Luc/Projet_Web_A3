@@ -7,7 +7,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&family=Inter:wght@400&display=swap" rel="stylesheet" />
+    <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="cluster.css" />
+
+  <link rel="stylesheet" href="cluster.css" />
+  <script src="cluster.js" defer></script>
 </head>
 <body>
 
@@ -23,7 +29,59 @@
     </ul>
   </nav>
 
-
+  <main class="cluster-main">
+ 
+    <!-- En-tête + filtre -->
+    <div class="cluster-header">
+      <div class="cluster-header-left">
+        <h1 class="cluster-titre">Prédiction du cluster géographique</h1>
+        <p class="cluster-sous-titre">Algorithme KMeans (K = 5) – Entraîné sur 137 516 stations IRVE</p>
+      </div>
+      <div class="cluster-header-right">
+        <select id="filtre-cluster" class="cluster-select">
+          <option value="all">Tous les clusters</option>
+          <option value="0">Cluster 0 – Nord-Est Frontalier</option>
+          <option value="1">Cluster 1 – Sud-Ouest</option>
+          <option value="2">Cluster 2 – IDF / Centre-Nord</option>
+          <option value="3">Cluster 3 – Sud-Est Méditerranée</option>
+          <option value="4">Cluster 4 – Grand Ouest</option>
+        </select>
+      </div>
+    </div>
+ 
+    <!-- Légende des clusters -->
+    <div class="cluster-legende">
+      <div class="legende-card" data-cluster="0">
+        <span class="legende-nom" style="color: #e53e3e;">Cluster 0</span>
+        <p class="legende-desc">Nord-Est<br>Frontalier</p>
+      </div>
+      <div class="legende-card" data-cluster="1">
+        <span class="legende-nom" style="color: #3182ce;">Cluster 1</span>
+        <p class="legende-desc">Sud-Ouest</p>
+      </div>
+      <div class="legende-card" data-cluster="2">
+        <span class="legende-nom" style="color: #38a169;">Cluster 2</span>
+        <p class="legende-desc">IDF / Centre-Nord</p>
+      </div>
+      <div class="legende-card" data-cluster="3">
+        <span class="legende-nom" style="color: #805ad5;">Cluster 3</span>
+        <p class="legende-desc">Sud-Est<br>Méditerranée</p>
+      </div>
+      <div class="legende-card" data-cluster="4">
+        <span class="legende-nom" style="color: #d69e2e;">Cluster 4</span>
+        <p class="legende-desc">Grand Ouest</p>
+      </div>
+    </div>
+ 
+    <!-- Carte Leaflet -->
+    <div class="cluster-carte-wrapper">
+      <div id="map"></div>
+      <div id="map-loader" class="map-loader">
+        <span>Chargement des points…</span>
+      </div>
+    </div>
+ 
+  </main>
 
 
   <!-- ===== FOOTER ===== -->
