@@ -141,24 +141,21 @@ INSERT INTO CONDITION_ACCES (libelle) VALUES
     ('Accès réservé');
 
 INSERT INTO ACCESSIBILITE_PMR (libelle) VALUES
-    ('Accessible'),
     ('Accessible mais non réservé PMR'),
-    ('Réservé PMR'),
     ('Accessibilité inconnue'),
-    ('Non accessible');
+    ('Non accessible'),
+    ('Réservé PMR');
 
 INSERT INTO RESTRICTION_GABARIT (libelle) VALUES
-    ('Hauteur 1m'),
-    ('Hauteur 2m'),
-    ('Hauteur 1.5m'),
-    ('Hauteur 3m'),
+    ('aucune'),
     ('inconnu'),
+    ('Hauteur 3m'),
+    ('Hauteur 2m'),
     ('vehicules legers uniquement'),
-    ('aucune');
+    ('Hauteur 1.5m');
 
 INSERT INTO IMPLANTATION (libelle) VALUES
-    ('Parking privé à usage public'),
     ('Parking public'),
+    ('Parking privé à usage public'),
     ('Voirie'),
-    ('Station service'),
-    ('Autre');
+    ('Parking privé réservé à la clientèle');
