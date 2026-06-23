@@ -1,0 +1,87 @@
+/* ============================================================
+   IMPORTS GOOGLE FONTS
+   Poppins (titres) + Inter (corps de texte)
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&family=Inter:wght@400&display=swap');
+
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #DEE9F4;
+  color: #000000;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+
+
+/* ============================================================
+   NAVBAR
+   ============================================================ */
+.navbar {
+  background-color: #2E0263;
+  height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.navbar-logo {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  color: #FFFFFF;
+  font-size: 1.1rem;
+  letter-spacing: 0.5px;
+}
+
+.navbar-links {
+  list-style: none;
+  display: flex;
+  gap: 8px;
+}
+
+.navbar-links a {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400;
+  color: #FFFFFF;
+  text-decoration: none;
+  font-size: 0.83rem;
+  padding: 6px 16px;
+  border: 1.5px solid #FFFFFF;
+  border-radius: 20px;
+  transition: background-color 0.2s ease;
+}
+
+.navbar-links a:hover,
+.navbar-links a.active {
+  background-color: rgba(255, 255, 255, 0.18);
+}
+
+
+
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.footer {
+  background-color: #FFFFFF;
+  text-align: center;
+  padding: 1rem 2rem;
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 0.82rem;
+  color: #4C70B5;
+}
