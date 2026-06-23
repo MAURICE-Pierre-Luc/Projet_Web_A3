@@ -70,6 +70,292 @@ body {
   background-color: rgba(255, 255, 255, 0.18);
 }
 
+/* ======= CONTENU PRINCIPAL ======= */
+.container {
+    flex: 1;
+    padding: 32px 40px;
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+h1 {
+    font-size: 26px;
+    font-weight: bold;
+    margin-bottom: 4px;
+    color: #111;
+}
+
+.sous-titre {
+    font-size: 13px;
+    color: #555;
+    margin-bottom: 20px;
+}
+
+/* ======= ONGLETS ======= */
+.onglets {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 20px;
+}
+
+.onglet {
+    padding: 7px 22px;
+    border-radius: 20px;
+    border: 1.5px solid #bbb;
+    background: white;
+    color: #333;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.onglet.actif {
+    background-color: #3b5bf5;
+    color: white;
+    border-color: #3b5bf5;
+}
+
+/* ======= BARRE OUTILS ======= */
+.barre-outils {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.nb-resultats {
+    font-size: 13px;
+    color: #555;
+}
+
+.outils-droite {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+#select-filtre {
+    padding: 7px 14px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: white;
+    font-size: 13px;
+    color: #333;
+    cursor: pointer;
+    appearance: auto;
+    min-width: 130px;
+}
+
+.champ-recherche {
+    display: flex;
+    align-items: center;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 0 10px;
+    gap: 6px;
+}
+
+.icone-recherche {
+    font-size: 14px;
+    color: #888;
+}
+
+#input-recherche {
+    border: none;
+    outline: none;
+    font-size: 13px;
+    padding: 7px 0;
+    width: 200px;
+    background: transparent;
+    color: #333;
+}
+
+/* ======= TABLEAU ======= */
+.table-wrapper {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #ddd;
+}
+
+#tableau-pdc {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+}
+
+#tableau-pdc thead tr {
+    background-color: #2D0A6E;
+}
+
+#tableau-pdc th {
+    padding: 12px 16px;
+    text-align: left;
+    color: white;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+#tableau-pdc td {
+    padding: 11px 16px;
+    border-bottom: 1px solid #f0f0f0;
+    color: #222;
+}
+
+/* Alternance des lignes */
+#tableau-pdc tbody tr:nth-child(odd) {
+    background-color: #f3f5fb;
+}
+
+#tableau-pdc tbody tr:nth-child(even) {
+    background-color: white;
+}
+
+#tableau-pdc tbody tr:hover {
+    background-color: #dde3ff;
+    cursor: pointer;
+}
+
+#tableau-pdc tbody tr.selectionnee {
+    background-color: #c8d2ff;
+}
+
+.chargement {
+    text-align: center;
+    color: #888;
+    padding: 30px !important;
+    font-style: italic;
+}
+
+/* ======= PIED TABLEAU : boutons + pagination ======= */
+.pied-tableau {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 16px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.boutons-prediction {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.btn-prediction {
+    padding: 9px 20px;
+    border: 1.5px solid #2D0A6E;
+    border-radius: 20px;
+    background: white;
+    color: #2D0A6E;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.btn-prediction:hover {
+    background-color: #2D0A6E;
+    color: white;
+}
+
+/* ======= PAGINATION ======= */
+.pagination {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.page-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1px solid #ccc;
+    background: white;
+    color: #333;
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+}
+
+.page-btn:hover {
+    background-color: #e8eaf0;
+}
+
+.page-btn.active {
+    background-color: #2D0A6E;
+    color: white;
+    border-color: #2D0A6E;
+}
+
+.page-btn.fleche {
+    font-size: 16px;
+    color: #555;
+}
+
+/* ======= CARTE ======= */
+#vue-carte {
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #ddd;
+}
+
+#carte {
+    height: 500px;
+    width: 100%;
+    border: 2px solid #ccc
+}
+
+/* Popup Leaflet personnalisée */
+.leaflet-popup-content {
+    font-size: 13px;
+    line-height: 1.8;
+    min-width: 200px;
+}
+
+.popup-titre {
+    font-weight: bold;
+    font-size: 14px;
+    margin-bottom: 4px;
+    color: #111;
+}
+
+.popup-adresse {
+    color: #666;
+    font-size: 12px;
+    margin-bottom: 8px;
+}
+
+.popup-ligne {
+    display: flex;
+    gap: 8px;
+}
+
+.popup-label {
+    color: #888;
+    min-width: 70px;
+}
+
+.popup-valeur {
+    color: #111;
+    font-weight: 500;
+}
+
+.popup-valeur.puissance  { color: #3b5bf5; }
+.popup-valeur.operateur  { color: #3b5bf5; }
+.popup-valeur.cluster    { color: #16a34a; }
+
+/* ======= UTILITAIRES ======= */
+.cache {
+    display: none;
+}
+
+
 
 
 
