@@ -7,7 +7,7 @@ CREATE TABLE OPERATEUR (
     id        INT AUTO_INCREMENT PRIMARY KEY,
     nom       VARCHAR(150) NOT NULL,
     contact   VARCHAR(150),
-    telephone VARCHAR(20)
+    telephone VARCHAR(30)
 );
 
 CREATE TABLE ACCESSIBILITE_PMR (
