@@ -14,7 +14,7 @@ DB_CONFIG = {
 }
 
 
-csv_path = "./IRVE_clean_web.csv"
+csv_path = "../../IRVE_clean_web.csv"
 
 df = pd.read_csv(csv_path, encoding="UTF-8")
 
@@ -88,6 +88,9 @@ manquantes = tables_attendues - tables_existantes
 if manquantes:
     raise RuntimeError(f"Tables manquantes dans la BD : {manquantes}")
  
+df = df.replace("inconnu", None)
+
+
 enum_cache = {}
  
 def get_or_create(table, libelle):
