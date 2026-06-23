@@ -8,9 +8,9 @@ import ast
 
 DB_CONFIG = {
     "host":     "localhost",
-    "user":     "plmaur28",
-    "password": "RogFyVroBIxSipNQ",
-    "database": "plmaur28",
+    "user":     "fallie28",
+    "password": "OfO4xqpiSVGo8ua8   ",
+    "database": "fallie",
 }
 
 
