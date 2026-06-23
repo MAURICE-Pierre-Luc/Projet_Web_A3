@@ -61,7 +61,10 @@ df["horaires"] = df["horaires"].map(parse_line)
 
 
 
-
+print(df["condition_acces"].unique())
+print(df["accessibilite_pmr"].unique())
+print(df["restriction_gabarit"].unique())
+print(df["implantation_station"].unique())
 
 
 print(df.head())

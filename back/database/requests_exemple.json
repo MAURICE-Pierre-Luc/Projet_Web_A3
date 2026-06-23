@@ -1,0 +1,115 @@
+php/request.php/station/?col=element_col
+
+reponse:{
+    id_station : "id",
+    nom_station : "nom",
+    adresse_station : "adresse",
+    longitude : long,
+    latitude : lat,
+    tarif_eur_kWh : tarif,
+    puissance_max_kW : puissance,
+    nbre_pdc : nbre,
+    reservation : res,
+    dates_mise_en_service : date,
+    id_operateur : id,
+    id_condition_acces : id,
+    id_restriction_gabarit : id,
+    id_accessibilite_pmr : id,
+    id_implantation : id
+}
+
+
+php/request.php/accessibilite_pmr/?id=id_accessibilite_pmr
+
+reponse:{
+    id_accessibilite : id,
+    libelle : "value"
+}
+
+php/request.php/operateur/?id=id_operateur
+
+reponse:{
+    id_opreateur : id,
+    nom_operateur : "nom",
+    contact : "contact",
+    telephone : "telephone"
+}
+
+php/request.php/implantation/?id=id_implantation
+
+reponse:{
+    id_implantation : id,
+    libelle : "value"
+}
+
+php/request.php/restriction_gabarit/?id=id_gabarit
+
+reponse:{
+    id_gabarit : id,
+    libelle : "value"
+}
+
+php/request.php/condition_acces/?id=id_condition_acces
+
+reponse:{
+    id_condition_acces : id,
+    libelle : "value"
+}
+
+php/request.php/station_horaire/?id=id_station
+
+reponse : {
+    id_station_horaire : id,
+    id_station : id,
+    id_horaire : id
+}
+
+php/request.php/horaire/?id=id_horaire
+
+reponse:{
+    id_horaire : id,
+    jour : "jour",
+    heure_debut : heure,
+    heure_fin : heure
+}
+
+php/request.php/station_prise/?id=id_station
+
+reponse:{
+    id_station_prise : id,
+    id_station : id,
+    id_prise : id
+}
+
+php/request.php/type_prise/?id=id_prise
+
+reponse:{
+    id_prise : id,
+    libelle : "value"
+}
+
+php/request.php/utilisateur/?user_name=nom_utilisateur
+
+reponse:{
+    id_utilisateur : id,
+    nom_utilisateur : "nom",
+    mot_de_passe : "mdp"
+}
+
+php/post.php/?table_name=table_name&content={col:col_content,...}
+
+reponse:{
+    id : id
+}
+
+php/put.php/?table_name=table_name&content_to_modify={col:content,...}
+
+reponse:{
+    id :id
+}
+
+php/delete.php/?table_name=table_name&id=id_to_delete
+
+reponse{
+    succes : bool
+}
