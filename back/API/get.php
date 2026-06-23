@@ -62,7 +62,7 @@ if (is_resource($process)) {
     fclose($pipes[0]);
 
     // On récupère la réponse de Python (le JSON final contenant les clusters)
-    $sortie Python = stream_get_contents($pipes[1]);
+    $sortiePython = stream_get_contents($pipes[1]);
     fclose($pipes[1]);
 
     // Gestion des erreurs Python potentielles
