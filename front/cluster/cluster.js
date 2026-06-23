@@ -4,16 +4,15 @@
  * Gestion de la carte Leaflet pour la page Prédiction du cluster géographique.
  *
  * Fonctionnement :
- *  1. Appel AJAX vers php/get_clusters.php qui :
- *     - Récupère les points de charge (lat, lon) depuis la BDD
- *     - Appelle predict_cluster.py via exec() pour chaque point
- *     - Retourne un tableau JSON : [{lat, lon, cluster, nom_station}, ...]
+ *  1. Appel AJAX vers back/API/get qui :
+ *     - Récupère les stations (lat, lon) depuis la BDD
+ *     - Appelle script_cluster.py via exec() pour chaque point
+ *     - Retourne un tableau JSON : [{lat, lon,cluster}]
  *  2. Placement des marqueurs colorés sur la carte Leaflet
  *  3. Filtre interactif par cluster (select + cartes légende)
  */
 
-import L from "leaflet";
-import "leaflet/dist/leaflet.css";
+
 /* ============================================================
    COULEURS PAR CLUSTER
    ============================================================ */
@@ -70,8 +69,7 @@ function creerIcone(couleur) {
 
 /* ============================================================
    CHARGEMENT DES POINTS DEPUIS LE SERVEUR PHP
-   Le PHP récupère les points depuis la BDD et appelle le script
-   Python pour prédire le cluster de chacun.
+   Le PHP récupère les coordonnées des points depuis la BDD et appelle le script Python pour prédire le cluster de chacun.
    ============================================================ */
 function chargerPoints(filtre = "all") {
   // Afficher le loader

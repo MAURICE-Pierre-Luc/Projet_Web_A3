@@ -1,33 +1,19 @@
 <?php
 /**
- * get_clusters.php
- *
- * Récupère les points de charge depuis la BDD, appelle le script Python
- * predict_cluster.py pour chaque point, et retourne un tableau JSON.
- *
- * Paramètre GET optionnel :
- *   ?cluster=0|1|2|3|4  → filtre sur un cluster précis
- *
- * Réponse JSON : [{ "lat": ..., "lon": ..., "cluster": ..., "nom_station": ... }, ...]
+ * get.php - Version Batch Processing
  */
 
 header("Content-Type: application/json; charset=utf-8");
 
-/* ============================================================
-   CONFIGURATION BASE DE DONNÉES
-   ============================================================ */
 $db_host = "localhost";
 $db_name = "fallie28";
 $db_user = "fallie28";
 $db_pass = "OfO4xqpiSVGo8ua8";
 
-$ia_dir      = __DIR__ . "/../scripts/";          
-$script      = $ia_dir . "predict_cluster.py";
-$python_bin  = "python3";                    // ou "python" selon le serveur
+$python_dir = __DIR__ . "/../scripts/";          
+$script     = $python_dir . "script_cluster.py"; 
+$python_bin = "python3"; 
 
-/* ============================================================
-   CONNEXION PDO
-   ============================================================ */
 try {
     $pdo = new PDO(
         "mysql:host=$db_host;dbname=$db_name;charset=utf8",
@@ -41,15 +27,10 @@ try {
     exit;
 }
 
-/* ============================================================
-   RÉCUPÉRATION DES POINTS DEPUIS LA BDD
-   Adapter les noms de colonnes selon votre MCD
-   ============================================================ */
+// 1. Récupération de TOUS les points en une seule fois
 try {
-    $sql = "SELECT latitude, longitude
-            FROM STATION
-            WHERE latitude IS NOT NULL
-            AND longitude IS NOT NULL";
+    
+    $sql = "SELECT latitude, longitude FROM STATION WHERE latitude IS NOT NULL AND longitude IS NOT NULL";
     $stmt = $pdo->query($sql);
     $points = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
@@ -58,43 +39,60 @@ try {
     exit;
 }
 
-/* ============================================================
-   APPEL DU SCRIPT PYTHON POUR CHAQUE POINT
-   ============================================================ */
-$filtre_cluster = isset($_GET["cluster"]) ? intval($_GET["cluster"]) : null;
-
-$resultats = [];
-
-foreach ($points as $point) {
-    $lat = floatval($point["latitude"]);
-    $lon = floatval($point["longitude"]);
-
-    // Échappement des arguments pour la sécurité
-    $lat_arg = escapeshellarg($lat);
-    $lon_arg = escapeshellarg($lon);
-
-    // On se place dans le dossier IA pour que les .pkl soient trouvés
-    $commande = "cd " . escapeshellarg($ia_dir) . " && $python_bin script_cluster.py -lat $lat_arg -lon $lon_arg 2>/dev/null";
-    $sortie = shell_exec($commande);
-
-    // Parsing de la sortie : "Cluster prédit :X"
-    if ($sortie !== null && preg_match('/Cluster prédit\s*:(\d+)/i', trim($sortie), $matches)) {
-        $cluster = intval($matches[1]);
-    } else {
-        // Prédiction impossible : on ignore ce point
-        continue;
-    }
-
-    // Filtre par cluster si demandé
-    if ($filtre_cluster !== null && $cluster !== $filtre_cluster) {
-        continue;
-    }
-
-    $resultats[] = [
-        "lat"         => $lat,
-        "lon"         => $lon,
-        "cluster"     => $cluster,
-    ];
+if (empty($points)) {
+    echo json_encode([]);
+    exit;
 }
 
-echo json_encode($resultats);
+// 2. Préparation de la commande pour ouvrir un processus Python
+$commande = "cd " . escapeshellarg($python_dir) . " && $python_bin " . escapeshellarg($script);
+
+// Définition des descripteurs de flux : 0 = STDIN (écriture), 1 = STDOUT (lecture), 2 = STDERR (erreurs)
+$descriptorspec = [
+    0 => ["pipe", "r"], 
+    1 => ["pipe", "w"], 
+    2 => ["pipe", "w"]  
+];
+
+$process = proc_open($commande, $descriptorspec, $pipes);
+
+if (is_resource($process)) {
+    // On envoie le tableau de points encodé en JSON à Python via STDIN
+    fwrite($pipes[0], json_encode($points));
+    fclose($pipes[0]);
+
+    // On récupère la réponse de Python (le JSON final contenant les clusters)
+    $sortie Python = stream_get_contents($pipes[1]);
+    fclose($pipes[1]);
+
+    // Gestion des erreurs Python potentielles
+    $erreurs = stream_get_contents($pipes[2]);
+    fclose($pipes[2]);
+
+    $return_value = proc_close($process);
+
+    if ($return_value !== 0) {
+        http_response_code(500);
+        echo json_encode(["error" => "Erreur script Python", "details" => $erreurs]);
+        exit;
+    }
+
+    // 3. Optionnel : Appliquer le filtre de cluster côté PHP si le paramètre GET est présent
+    $filtre_cluster = isset($_GET["cluster"]) ? intval($_GET["cluster"]) : null;
+    
+    if ($filtre_cluster !== null) {
+        $donnees_completes = json_decode($sortiePython, true);
+        $donnees_filtrees = array_filter($donnees_completes, function($point) use ($filtre_cluster) {
+            return intval($point['cluster']) === $filtre_cluster;
+        });
+        // Réindexation du tableau pour éviter d'avoir des clés associatives en JSON
+        echo json_encode(array_values($donnees_filtrees));
+    } else {
+        // Si aucun filtre, on renvoie directement la sortie brute de Python
+        echo $sortiePython;
+    }
+
+} else {
+    http_response_code(500);
+    echo json_encode(["error" => "Impossible d'exécuter le processus Python."]);
+}
