@@ -38,7 +38,10 @@ def main():
     df = pd.DataFrame(points)
     X = df[['latitude', 'longitude']].astype(float)
 
-    # 4. Inférence en lot (Batch prediction) - Prend quelques millisecondes pour 3915 lignes
+    # On renomme les colonnes pour matcher exactement l'entraînement
+    X.columns = ['consolidated_latitude', 'consolidated_longitude']
+
+    # 4. Inférence en lot (Batch prediction) - Prend quelques millisecondes pour nos 3915 lignes
     try :
         X_scaled = scaler.transform(X)
         predictions = kmeans_model.predict(X)
