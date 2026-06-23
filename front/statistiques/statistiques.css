@@ -70,6 +70,138 @@ body {
   background-color: rgba(255, 255, 255, 0.18);
 }
 
+/*Content*/
+
+.stats-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* Header */
+
+.stats-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+}
+
+.stats-header h1 {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.stats-header p {
+    margin-top: 0.4rem;
+    color: #6b7280;
+}
+
+.view-selector {
+    padding: 0.75rem 1rem;
+    border: none;
+    border-radius: 10px;
+    background: white;
+    min-width: 180px;
+    cursor: pointer;
+}
+
+/* Cartes statistiques */
+
+.stats-cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.stat-card h3 {
+    margin: 0 0 0.8rem;
+    font-size: 1rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.stat-card .value {
+    display: block;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.stat-card .unit {
+    display: block;
+    color: #64748b;
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+}
+
+/* Graphiques */
+
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+}
+
+.chart-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.chart-card h3 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+}
+
+.chart-placeholder {
+    height: 300px;
+    border: 2px dashed #cbd5e1;
+    border-radius: 12px;
+    background: #f8fafc;
+}
+
+/* Responsive */
+
+@media (max-width: 992px) {
+    .stats-cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 576px) {
+    .stats-header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .stats-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .view-selector {
+        width: 100%;
+    }
+}
+
+
+
+
+
 
 
 
