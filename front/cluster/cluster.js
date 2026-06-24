@@ -17,19 +17,15 @@
    COULEURS PAR CLUSTER
    ============================================================ */
 const CLUSTER_COULEURS = {
-  0: "#e53e3e",   // rouge   – Nord-Est Frontalier
-  1: "#3182ce",   // bleu    – Sud-Ouest
-  2: "#38a169",   // vert    – IDF / Centre-Nord
-  3: "#805ad5",   // violet  – Sud-Est Méditerranée
-  4: "#d69e2e",   // jaune   – Grand Ouest
+  0: "#e53e3e",   
+  1: "#3182ce",  
+  2: "#38a169",   
 };
 
 const CLUSTER_NOMS = {
-  0: "Nord-Est Frontalier",
-  1: "Sud-Ouest",
-  2: "IDF / Centre-Nord",
-  3: "Sud-Est Méditerranée",
-  4: "Grand Ouest",
+  0: "Façade Atlantique & Sud-Ouest",
+  1: "Hub Parisien & Grand Nord-Est",
+  2: "Grand Sud-Est & Méditerranée",
 };
 
 /* ============================================================
@@ -81,7 +77,7 @@ function chargerPoints(filtre = "all") {
       // Placer chaque point sur la carte
       points.forEach((point) => {
         const couleur = CLUSTER_COULEURS[point.cluster] ?? "#64748B";
-        //On utilise circleMarker pour éviter au JS de créer 4000 éléménts HTML et de lag
+        //On utilise circleMarker pour éviter au JS de créer 4000 éléménts HTML et de faire lag la page web
         const marker = L.circleMarker([point.lat, point.lon], {
           radius: 5,           // Taille du point
           fillColor: couleur,  // Couleur de l'IA
