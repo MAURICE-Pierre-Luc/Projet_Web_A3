@@ -28,7 +28,7 @@ async function getData(api_link, args = "?table=station") {
     }
 
 
-    console.log(data);
+    console.log(result);
 
     result = JSON.parse(await result.text());
     //console.log(result);
