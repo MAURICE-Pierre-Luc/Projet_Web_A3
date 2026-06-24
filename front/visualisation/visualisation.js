@@ -61,8 +61,8 @@ function chargerPointsDeCharge() {
 
             // Mettre à jour le compteur en haut de page
             document.getElementById("compteurs").textContent =
-                donnees.length.toLocaleString("fr-FR") + " Stations · " +
-                donnees.length.toLocaleString("fr-FR") + " Points de charge";
+                donnees.length.toLocaleString("fr-FR") + " Stations"
+                d
 
             afficherPage(1);
         })
@@ -102,7 +102,7 @@ function afficherPage(page) {
         const selectionClass = (pdc.id === idSelectionne) ? " selectionnee" : "";
         html += `
         <tr class="${selectionClass}" onclick="selectionnerLigne(this, ${pdc.id})">
-            <td>${pdc.commune || "—"}</td>
+            <td>${pdc.adresse || "—"}</td>
             <td>${pdc.acces || "—"}</td>
             <td>${pdc.type_implantation || "—"}</td>
             <td>${pdc.puissance_nominale || "—"}</td>
@@ -169,7 +169,7 @@ function filtrerTableau() {
 
         // Sinon, chercher dans toutes les colonnes affichées
         return (
-            String(pdc.commune          || "").toLowerCase().includes(texteRecherche) ||
+            String(pdc.adresse          || "").toLowerCase().includes(texteRecherche) ||
             String(pdc.acces            || "").toLowerCase().includes(texteRecherche) ||
             String(pdc.type_implantation|| "").toLowerCase().includes(texteRecherche) ||
             String(pdc.operateur        || "").toLowerCase().includes(texteRecherche)
@@ -212,7 +212,7 @@ function initialiserCarte() {
    CARTE — Chargement des stations via AJAX
 ============================================================ */
 function chargerStations() {
-    fetch("php/get_stations.php")
+    fetch(api_link + "get_visualisation.php")
         .then(function (rep) {
             if (!rep.ok) throw new Error("Erreur HTTP " + rep.status);
             return rep.json();
