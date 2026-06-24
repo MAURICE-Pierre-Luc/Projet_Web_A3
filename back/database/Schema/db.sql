@@ -32,7 +32,7 @@ CREATE TABLE RESTRICTION_GABARIT (
 
 
 CREATE TABLE STATION (
-    id_station            VARCHAR(50)    PRIMARY KEY,
+    id                    VARCHAR(50)    PRIMARY KEY,
     nom_enseigne          VARCHAR(150),
     adresse_station       VARCHAR(255),
     longitude             DECIMAL(10, 7) NOT NULL,
