@@ -61,8 +61,8 @@ function chargerPoints(filtre = "all") {
   // Construire l'URL avec le filtre optionnel
   const url =
     filtre === "all"
-      ? "/back/API/get.php"
-      : `/back/API/get.php?cluster=${filtre}`;
+      ? "/back/API/get_cluster.php"
+      : `/back/API/get.php_cluster?cluster=${filtre}`;
 
   fetch(url)
     .then((response) => {
