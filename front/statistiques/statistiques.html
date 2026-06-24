@@ -8,6 +8,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&family=Inter:wght@400&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="statistiques.css" />
+  <script src="../env.js" defer></script>
+  <script src="statistiques.js" defer></script>
 </head>
 <body>
 
@@ -41,26 +43,26 @@
     <section class="stats-cards">
         <div class="stat-card">
             <h3>Stations</h3>
-            <span class="value"> </span> 
+            <span class="value" id="nbre_stations"> </span> 
             <!-- Il faut ajouter la vraie valeur -->
         </div>
 
         <div class="stat-card">
             <h3>Points de charge</h3>
-            <span class="value"></span>
+            <span class="value" id="pt_charge"></span>
             <!-- Il faut ajouter la vraie valeur -->
         </div>
 
         <div class="stat-card">
             <h3>Puissance moyenne</h3>
-            <span class="value"></span>
+            <span class="value" id="puiss_moy"></span>
             <!-- Il faut ajouter la vraie valeur -->
             <span class="unit">kW par station</span>
         </div>
 
         <div class="stat-card">
             <h3>Tarification moyenne</h3>
-            <span class="value"></span>
+            <span class="value" id="tarif_moy"></span>
             <!-- Il faut ajouter la vraie valeur -->
             <span class="unit">€ / kWh</span>
         </div>
