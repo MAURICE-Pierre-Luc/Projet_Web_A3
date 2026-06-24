@@ -5,7 +5,7 @@ header("Access-Control-Allow-Origin: *");
 
 // 1. Définir le chemin vers le fichier .env
 // __DIR__ représente le dossier actuel (back/API). On remonte d'un cran (../) pour trouver le .env
-$envPath = __DIR__ . '/../database/.env';
+$envPath = __DIR__ . '/database/.env';
 
 // 2. Lire le fichier .env
 if (!file_exists($envPath)) {
