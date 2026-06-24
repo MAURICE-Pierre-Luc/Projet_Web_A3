@@ -130,6 +130,10 @@ body {
   flex-direction: column;
 }
 
+.card:hover{
+  background-color: #4C70B5;
+}
+
 .card-title {
   font-family: 'Poppins', sans-serif;
   font-weight: 700;
@@ -147,19 +151,7 @@ body {
   flex: 1;
 }
 
-.card-link {
-  display: inline-block;
-  margin-top: 1rem;
-  font-family: 'Poppins', sans-serif;
-  font-weight: 400;
-  font-size: 0.84rem;
-  color: #4C70B5;
-  text-decoration: none;
-}
 
-.card-link:hover {
-  text-decoration: underline;
-}
 
 /* ============================================================
    IMAGE CENTRALE

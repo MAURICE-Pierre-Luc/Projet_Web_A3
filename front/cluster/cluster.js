@@ -72,8 +72,6 @@ function chargerPoints(filtre = "all") {
       return response.json();
     })
     .then((points) => {
-      //Debug
-      console.log("3 premiers points :", points.slice(0,3));
       // Placer chaque point sur la carte
       points.forEach((point) => {
         const couleur = CLUSTER_COULEURS[point.cluster] ?? "#64748B";
