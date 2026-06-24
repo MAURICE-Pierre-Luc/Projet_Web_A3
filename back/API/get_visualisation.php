@@ -46,10 +46,10 @@ try {
                 op.nom AS operateur,
                 s.latitude,
                 s.longitude
-            FROM station s
-            LEFT JOIN condition_acces ca ON s.id_condition_acces = ca.id
-            LEFT JOIN implantation imp ON s.id_implantation = imp.id
-            LEFT JOIN operateur op ON s.id_operateur = op.id
+            FROM STATION s
+            LEFT JOIN CONDITION_ACCES ca ON s.id_condition_acces = ca.id
+            LEFT JOIN IMPLANTATION imp ON s.id_implantation = imp.id
+            LEFT JOIN OPERATEUR op ON s.id_operateur = op.id
             WHERE s.latitude IS NOT NULL 
               AND s.longitude IS NOT NULL
               AND s.latitude BETWEEN 41.15 AND 51.5 
