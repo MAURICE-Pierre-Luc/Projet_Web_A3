@@ -76,7 +76,7 @@ Création des instances de tables
 */
 
 
-$Station = new db($conn, 'station', 'id', ['id_station','nom_enseigne','adresse_station','longitude','latitude','tarif_eur_kwh','puissance_max_kw','nbre_pdc','reservation','date_mise_en_service','id_operateur','id_condition_acces','id_restriction_gabarit','id_accessibilite_pmr','id_implantation']);
+$Station = new db($conn, 'station', 'id', ['id','nom_enseigne','adresse_station','longitude','latitude','tarif_eur_kwh','puissance_max_kw','nbre_pdc','reservation','date_mise_en_service','id_operateur','id_condition_acces','id_restriction_gabarit','id_accessibilite_pmr','id_implantation']);
 
 $Restriction_Gabarit = new db($conn, 'restriction_gabarit', 'id', ['id','libelle']);
 $Implantation = new db($conn, 'implantation', 'id', ['id','libelle']);
@@ -115,5 +115,4 @@ $databaseTables = [
 
     'utilisateur' => $Utilisateur
 ]
-
 ?> 

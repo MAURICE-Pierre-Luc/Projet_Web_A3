@@ -10,7 +10,7 @@ if (!isset($_SESSION['user'])) {
 
 
 
-require_once('../databases/conn.php');
+require_once('../database/conn.php');
 header('Content-Type: application/json');
 
 $schema = [];                            // Tableau final pour stocker le schéma

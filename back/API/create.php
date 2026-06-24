@@ -23,7 +23,7 @@ if (!isset($_SESSION['user'])) {
 */
 
 
-include_once "../databases/conn.php"; // Important pour le $databaseTables
+include_once "../database/conn.php"; // Important pour le $databaseTables
 header('Content-Type: application/json');
 
 if (!isset($_POST['table']) || !isset($databaseTables[$_POST['table']])) { 
@@ -62,7 +62,10 @@ foreach ($allowedMethods as $method => $expectedParams) { //Boucle sur chaque cl
 
     if ($expectedParams === $filteredKeys) { //check si on a les memes clés que la fonction qu'on verifie
         $calledMethod = $method; //On choisi donc celle ci a appelé
-        $methodParams = array_map(fn($param) => $_POST[$param], $unsortedParams); //Recupere les valeures de toute les clés de expectedParams dans le $_POST
+        //$methodParams = array_map(fn($param) => $_POST[$param], $unsortedParams); //Recupere les valeures de toute les clés de expectedParams dans le $_POST
+        $methodParams = array_map(function ($param) {
+            return $_POST[$param];
+        }, $unsortedParams);
         break;
     }
 }

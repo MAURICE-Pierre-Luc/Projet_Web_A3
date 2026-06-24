@@ -3,14 +3,15 @@ import re
 from collections import defaultdict
 import mysql.connector
 import ast
+import unicodedata
 
 
 
 DB_CONFIG = {
     "host":     "localhost",
-    "user":     "fallie28",
-    "password": "OfO4xqpiSVGo8ua8",
-    "database": "fallie28",
+    "user":     "plmaur28",
+    "password": "RogFyVroBIxSipNQ",
+    "database": "plmaur28",
 }
 
 
@@ -24,9 +25,15 @@ df = df[columns_to_keep]
 
 DAYS_ORDER = ["mo", "tu", "we", "th", "fr", "sa", "su"]
 
+
+def remove_accents(value):
+    """Supprime les accents d'une chaîne de caractères."""
+    if not isinstance(value, str):
+        return value
+    return unicodedata.normalize("NFD", value).encode("ascii", "ignore").decode("ascii")
+
+
 def expand_days(day_part):
-    # Développe une expression de jours en liste atomique
-    # Supporte les virgules ("mo,we") et les plages ("mo-fr")
     day_part = day_part.strip()
     if "," in day_part:
         result = []
@@ -40,19 +47,16 @@ def expand_days(day_part):
         i1, i2 = DAYS_ORDER.index(start), DAYS_ORDER.index(end)
         if i1 <= i2:
             return DAYS_ORDER[i1:i2 + 1]
-        # Gestion des plages qui passent minuit (ex: sa-mo)
         return DAYS_ORDER[i1:] + DAYS_ORDER[:i2 + 1]
     return [day_part] if day_part in DAYS_ORDER else []
 
 def parse_hours(h):
-    # Extrait les bornes d'une plage horaire au format "HH:MM-HH:MM"
     m = re.match(r"^\s*(\d{2}:\d{2})\s*-\s*(\d{2}:\d{2})\s*$", h)
     if not m:
         return None
     return m.group(1), m.group(2)
 
 def parse_line(line):
-    # Parse une ligne d'horaires complète en dict {jour: [(début, fin), …]}
     if not isinstance(line, str):
         return {}
     result = defaultdict(list)
@@ -71,12 +75,20 @@ def parse_line(line):
 
 df["horaires"] = df["horaires"].map(parse_line)
 
+# Suppression des accents sur toutes les colonnes texte
+text_columns = [
+    "nom_operateur", "contact_operateur", "telephone_operateur",
+    "nom_enseigne", "implantation_station", "adresse_station",
+    "condition_acces", "accessibilite_pmr", "restriction_gabarit",
+]
+for col in text_columns:
+    if col in df.columns:
+        df[col] = df[col].map(remove_accents)
 
 
 conn = mysql.connector.connect(**DB_CONFIG)
 cursor = conn.cursor()
  
-# Vérification rapide que les tables existent bien
 cursor.execute("SHOW TABLES")
 tables_existantes = {t[0].lower() for t in cursor.fetchall()}
 tables_attendues  = {
@@ -94,9 +106,9 @@ df = df.replace("inconnu", None)
 enum_cache = {}
  
 def get_or_create(table, libelle):
-    """Retourne l'id d'un libellé dans une table enum, le crée si absent."""
     if libelle is None:
         return None
+    libelle = remove_accents(libelle)
     key = (table, libelle)
     if key in enum_cache:
         return enum_cache[key]
@@ -115,15 +127,18 @@ operateur_cache = {}
 def get_or_create_operateur(nom, contact, telephone):
     if nom is None:
         return None
+    nom       = remove_accents(nom)
+    contact   = remove_accents(contact)
+    telephone = remove_accents(telephone)
     if nom in operateur_cache:
         return operateur_cache[nom]
-    cursor.execute("SELECT id FROM OPERATEUR WHERE nom = %s", (nom,))
+    cursor.execute("SELECT id FROM operateur WHERE nom = %s", (nom,))
     row = cursor.fetchone()
     if row:
         operateur_cache[nom] = row[0]
     else:
         cursor.execute(
-            "INSERT INTO OPERATEUR (nom, contact, telephone) VALUES (%s, %s, %s)",
+            "INSERT INTO operateur (nom, contact, telephone) VALUES (%s, %s, %s)",
             (nom, contact, telephone)
         )
         operateur_cache[nom] = cursor.lastrowid
@@ -137,7 +152,7 @@ def get_or_create_horaire(jour, heure_debut, heure_fin):
     if key in horaire_cache:
         return horaire_cache[key]
     cursor.execute(
-        "SELECT id FROM HORAIRE WHERE jour = %s AND heure_debut = %s AND heure_fin = %s",
+        "SELECT id FROM horaire WHERE jour = %s AND heure_debut = %s AND heure_fin = %s",
         (jour, heure_debut, heure_fin)
     )
     row = cursor.fetchone()
@@ -145,7 +160,7 @@ def get_or_create_horaire(jour, heure_debut, heure_fin):
         horaire_cache[key] = row[0]
     else:
         cursor.execute(
-            "INSERT INTO HORAIRE (jour, heure_debut, heure_fin) VALUES (%s, %s, %s)",
+            "INSERT INTO horaire (jour, heure_debut, heure_fin) VALUES (%s, %s, %s)",
             (jour, heure_debut, heure_fin)
         )
         horaire_cache[key] = cursor.lastrowid
@@ -171,10 +186,10 @@ for _, row in df.iterrows():
     )
  
     # -- Tables enum --
-    id_condition_acces     = get_or_create("CONDITION_ACCES",     row.get("condition_acces"))
-    id_restriction_gabarit = get_or_create("RESTRICTION_GABARIT", row.get("restriction_gabarit"))
-    id_accessibilite_pmr   = get_or_create("ACCESSIBILITE_PMR",   row.get("accessibilite_pmr"))
-    id_implantation        = get_or_create("IMPLANTATION",        row.get("implantation_station"))
+    id_condition_acces     = get_or_create("condition_acces",     row.get("condition_acces"))
+    id_restriction_gabarit = get_or_create("restriction_gabarit", row.get("restriction_gabarit"))
+    id_accessibilite_pmr   = get_or_create("accessibilite_pmr",   row.get("accessibilite_pmr"))
+    id_implantation        = get_or_create("implantation",        row.get("implantation_station"))
  
     # -- Coordonnées --
     longitude, latitude = None, None
@@ -187,27 +202,31 @@ for _, row in df.iterrows():
  
     # -- Date --
     date_mise_en_service = row.get("date_mise_en_service") or None
+
+    # -- Champs texte de la station --
+    nom_enseigne    = remove_accents(row.get("nom_enseigne"))
+    adresse_station = remove_accents(row.get("adresse_station"))
  
     # -- Station --
     cursor.execute("""
-        INSERT INTO STATION (
-            id_station, nom_enseigne, adresse_station,
+        INSERT INTO station (
+            id, nom_enseigne, adresse_station,
             longitude, latitude, tarif_eur_kwh, puissance_max_kw,
             nbre_pdc, reservation, date_mise_en_service,
             id_operateur, id_condition_acces, id_restriction_gabarit,
             id_accessibilite_pmr, id_implantation
         ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-        ON DUPLICATE KEY UPDATE id_station = id_station
+        ON DUPLICATE KEY UPDATE id = id
     """, (
         row["id_station_itinerance"],
-        row.get("nom_enseigne"),
-        row.get("adresse_station"),
+        nom_enseigne,
+        adresse_station,
         longitude,
         latitude,
         row.get("tarification_eur_kWh"),
         row.get("puissance_nominale"),
         row.get("nbre_pdc"),
-        False,  # reservation : non présent dans le CSV conservé
+        False,
         date_mise_en_service,
         id_operateur,
         id_condition_acces,
@@ -222,9 +241,9 @@ for _, row in df.iterrows():
     for col, libelle in PRISES.items():
         valeur = row.get(col)
         if valeur is True or str(valeur).strip().upper() == "TRUE":
-            id_type_prise = get_or_create("TYPE_PRISE", libelle)
+            id_type_prise = get_or_create("type_prise", libelle)
             cursor.execute("""
-                INSERT IGNORE INTO STATION_PRISE (id_station, id_type_prise)
+                INSERT IGNORE INTO station_prise (id_station, id_type_prise)
                 VALUES (%s, %s)
             """, (id_station, id_type_prise))
  
@@ -232,15 +251,13 @@ for _, row in df.iterrows():
     horaires_raw = row.get("horaires")
     if horaires_raw:
         try:
-            # Format attendu après ta transformation :
-            # {'mo': [('07:45', '12:00'), ('13:45', '19:00')], ...}
             if isinstance(horaires_raw, str):
                 horaires_raw = ast.literal_eval(horaires_raw)
             for jour, plages in horaires_raw.items():
                 for (heure_debut, heure_fin) in plages:
                     id_horaire = get_or_create_horaire(jour, heure_debut, heure_fin)
                     cursor.execute("""
-                        INSERT IGNORE INTO STATION_HORAIRE (id_station, id_horaire)
+                        INSERT IGNORE INTO station_horaire (id_station, id_horaire)
                         VALUES (%s, %s)
                     """, (id_station, id_horaire))
         except Exception:
@@ -250,4 +267,3 @@ for _, row in df.iterrows():
 conn.commit()
 cursor.close()
 conn.close()
-

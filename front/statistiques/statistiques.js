@@ -14,7 +14,11 @@ async function GetStationsCount() {
 
     let nbre_station_element = document.getElementById('nbre_stations');
 
-    let stations = await getData(api_link + "request.php/", "?table=station");
+    let stations = await getData(api_link + "request.php", "?table=station");
+
+    let nbre_stations = Object.keys(stations).length
+
+    console.log(nbre_stations)
 
 
 }
@@ -22,7 +26,7 @@ async function GetStationsCount() {
 
 
 async function getData(api_link, args = "?table=station") {
-    let result = await fetch(api_link + args, true);
+    let result = await fetch(api_link + args);
     if (!result.ok) {
         throw new Error("Network response was not ok " + result.statusText);
     }
