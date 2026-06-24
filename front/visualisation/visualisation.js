@@ -50,7 +50,7 @@ function basculerOnglet(onglet) {
 /* 
    TABLEAU — Chargement des données via AJAX */
 function chargerPointsDeCharge() {
-    fetch("php/get_points_de_charge.php")
+    fetch(api_link + "get_visualisation.php")
         .then(function (rep) {
             if (!rep.ok) throw new Error("Erreur HTTP " + rep.status);
             return rep.json();
