@@ -62,7 +62,7 @@ function chargerPointsDeCharge() {
             // Mettre à jour le compteur en haut de page
             document.getElementById("compteurs").textContent =
                 donnees.length.toLocaleString("fr-FR") + " Stations"
-                d
+                
 
             afficherPage(1);
         })
