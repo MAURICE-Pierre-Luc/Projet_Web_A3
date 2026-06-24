@@ -293,7 +293,7 @@ function afficherMarqueurs(stations) {
 function allerPrediction(cible) {
     if (cible === "clusters") {
         // Pas besoin de sélection pour les clusters (tous les PDC)
-        window.location.href = "cluster.html";
+        window.location.href = "/cluster/cluster.html";
         return;
     }
 
