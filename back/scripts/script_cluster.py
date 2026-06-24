@@ -20,8 +20,8 @@ def main():
 
     # 2. Chargement du modèle de clustering et du scaler
     
-    model_path = os.path.join(os.path.dirname(__file__), "modele_kmeans.pkl")
-    scaler_path = os.path.join(os.path.dirname(__file__), "scaler_kmeans.pkl")
+    model_path = os.path.join(os.path.dirname(__file__), "modele_kmeans_3.pkl")
+    scaler_path = os.path.join(os.path.dirname(__file__), "scaler_kmeans_3.pkl")
     
     if not os.path.exists(model_path):
         print(json.dumps({"error": f"Modèle introuvable à l'emplacement: {model_path}"}), file=sys.stderr)
