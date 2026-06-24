@@ -3,9 +3,18 @@
 header("Content-Type: application/json; charset=utf-8");
 header("Access-Control-Allow-Origin: *");
 
+$cheminDossierDb = __DIR__ . '/../database';
+
+echo json_encode([
+    "1. Le dossier database existe-t-il pour PHP ?" => is_dir($cheminDossierDb) ? "OUI" : "NON",
+    "2. Chemin absolu du dossier database" => realpath($cheminDossierDb),
+    "3. Contenu du dossier database (vu par PHP)" => is_dir($cheminDossierDb) ? scandir($cheminDossierDb) : "Impossible d'ouvrir le dossier"
+], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+exit;
+
 // 1. Définir le chemin vers le fichier .env
 // __DIR__ représente le dossier actuel (back/API). On remonte d'un cran (../) pour trouver le .env
-$envPath = realpath(__DIR__ . '/../database/.env');
+$envPath = __DIR__ . '/../database/.env';
 
 // 2. Lire le fichier .env
 if (!file_exists($envPath)) {
