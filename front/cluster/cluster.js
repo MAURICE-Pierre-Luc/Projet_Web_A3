@@ -7,7 +7,7 @@
  *  1. Appel AJAX vers back/API/get qui :
  *     - Récupère les stations (lat, lon) depuis la BDD
  *     - Appelle script_cluster.py via exec() pour chaque point
- *     - Retourne un tableau JSON : [{lat, lon,cluster}]
+ *     - Retourne un tableau JSON : [{lat, lon, cluster}]
  *  2. Placement des marqueurs colorés sur la carte Leaflet
  *  3. Filtre interactif par cluster (select + cartes légende)
  */
