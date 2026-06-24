@@ -14,7 +14,7 @@ async function GetStationsCount() {
 
     let nbre_station_element = document.getElementById('nbre_stations');
 
-    let stations = await getData(api_link + "request.php", "?table=station");
+    let stations = await getData(api_link + "request.php/", "?table=station");
 
 
 }
