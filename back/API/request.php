@@ -55,7 +55,7 @@
 */
 
 
-include_once "../databases/conn.php"; // Important pour le $databaseTables
+include_once "../database/conn.php"; // Important pour le $databaseTables
 header('Content-Type: application/json');
 
 if (!isset($_GET['table']) || !isset($databaseTables[$_GET['table']])) { //If the table is missing/invalid, we can't do anything
@@ -102,7 +102,10 @@ foreach ($allowedMethods as $method => $expectedParams) { //Boucle sur chaque cl
             $calledMethod = "request_in_order";
         }
         
-        $methodParams = array_map(fn($param) => $_GET[$param], $unsortedParams); //Recupere les valeures de toute les clés de expectedParams dans le $_GET
+        //$methodParams = array_map(fn($param) => $_GET[$param], $unsortedParams); //Recupere les valeures de toute les clés de expectedParams dans le $_GET
+        $methodParams = array_map(function ($param) {
+            return $_GET[$param];
+        }, $unsortedParams);
         break;
     }
 }
