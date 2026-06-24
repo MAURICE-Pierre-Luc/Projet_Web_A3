@@ -27,6 +27,9 @@ async function getData(api_link, args = "?table=station") {
         throw new Error("Network response was not ok " + result.statusText);
     }
 
+
+    console.log(data);
+
     result = JSON.parse(await result.text());
     //console.log(result);
     if (!result || !result.data) {
