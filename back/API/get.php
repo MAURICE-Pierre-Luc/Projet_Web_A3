@@ -30,7 +30,9 @@ try {
 // 1. Récupération de TOUS les points en une seule fois
 try {
     
-    $sql = "SELECT latitude, longitude FROM STATION WHERE latitude IS NOT NULL AND longitude IS NOT NULL";
+    $sql = "SELECT latitude, longitude FROM STATION WHERE latitude IS NOT NULL AND longitude IS NOT NULL
+    AND latitude BETWEEN 41.15 AND 51.5 AND longitude BETWEEN -10.0 AND 10.0";
+           
     $stmt = $pdo->query($sql);
     $points = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
