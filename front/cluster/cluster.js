@@ -81,6 +81,7 @@ function chargerPoints(filtre = "all") {
       // Placer chaque point sur la carte
       points.forEach((point) => {
         const couleur = CLUSTER_COULEURS[point.cluster] ?? "#64748B";
+        //On utilise circleMarker pour éviter au JS de créer 4000 éléménts HTML et de lag
         const marker = L.circleMarker([point.lat, point.lon], {
           radius: 5,           // Taille du point
           fillColor: couleur,  // Couleur de l'IA

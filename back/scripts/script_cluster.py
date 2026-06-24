@@ -48,7 +48,11 @@ def main():
         # On ajoute les prédictions comme une nouvelle clé dans nos dictionnaires d'origine
         for i, point in enumerate(points):
             point['cluster'] = int(predictions[i])
-            # Optionnel : Tu peux renommer les clés ici si ton JS attend 'lat' et 'lon' au lieu de 'latitude'/'longitude'
+
+            # Debug
+            point['scaled_lat'] = float(X_scaled[i][0])
+            point['scaled_lon'] = float(X_scaled[i][1])
+            
             point['lat'] = float(point.pop('latitude'))
             point['lon'] = float(point.pop('longitude'))
     except Exception as e:
