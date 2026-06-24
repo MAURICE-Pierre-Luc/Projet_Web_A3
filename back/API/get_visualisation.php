@@ -10,7 +10,9 @@ $envPath = __DIR__ . '/../database/.env';
 // 2. Lire le fichier .env
 if (!file_exists($envPath)) {
     http_response_code(500);
-    echo json_encode(["error" => "Erreur critique : Fichier d'environnement introuvable."]);
+    echo json_encode(["error" => "Erreur critique : Fichier d'environnement introuvable.",
+    "chemin_fouillé_par_php" => $envPath,]);
+    
     exit;
 }
 
