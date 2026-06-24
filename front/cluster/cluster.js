@@ -35,7 +35,7 @@ const CLUSTER_NOMS = {
 /* ============================================================
    INITIALISATION DE LA CARTE LEAFLET
    ============================================================ */
-const map = L.map("map").setView([46.6, 2.3], 6); // centrée sur la France
+const map = L.map("map", { preferCanvas: true }).setView([46.6, 2.3], 6); // centrée sur la France
 
 // Fond de carte OpenStreetMap
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -49,23 +49,6 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
 let tousLesMarqueurs = []; // tableau de { marker, cluster }
 const loader = document.getElementById("map-loader");
 
-/* ============================================================
-   CRÉATION D'UN MARQUEUR COLORÉ
-   Leaflet utilise des icônes SVG inline pour la couleur
-   ============================================================ */
-function creerIcone(couleur) {
-  const svg = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12">
-      <circle cx="6" cy="6" r="5" fill="${couleur}" stroke="#FFFFFF" stroke-width="1.2"/>
-    </svg>`;
-  return L.divIcon({
-    html: svg,
-    className: "",          // supprime le style Leaflet par défaut
-    iconSize: [12, 12],
-    iconAnchor: [6, 6],
-    popupAnchor: [0, -8],
-  });
-}
 
 /* ============================================================
    CHARGEMENT DES POINTS DEPUIS LE SERVEUR PHP
@@ -98,9 +81,14 @@ function chargerPoints(filtre = "all") {
       // Placer chaque point sur la carte
       points.forEach((point) => {
         const couleur = CLUSTER_COULEURS[point.cluster] ?? "#64748B";
-        const icone = creerIcone(couleur);
-
-        const marker = L.marker([point.lat, point.lon], { icon: icone })
+        const marker = L.circleMarker([point.lat, point.lon], {
+          radius: 5,           // Taille du point
+          fillColor: couleur,  // Couleur de l'IA
+          color: "#FFFFFF",    // Bordure blanche
+          weight: 1,           // Épaisseur de la bordure
+          opacity: 1,
+          fillOpacity: 0.9
+        })
           .bindPopup(
             `<b>${point.nom_station ?? "Station"}</b><br>
              Cluster ${point.cluster} – ${CLUSTER_NOMS[point.cluster] ?? ""}<br>
@@ -110,7 +98,6 @@ function chargerPoints(filtre = "all") {
 
         tousLesMarqueurs.push({ marker, cluster: point.cluster });
       });
-
       // Masquer le loader
       loader.classList.add("hidden");
     })
