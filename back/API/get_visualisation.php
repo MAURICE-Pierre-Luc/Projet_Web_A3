@@ -36,7 +36,7 @@ try {
 
     // Requête avec jointures (LEFT JOIN) pour récupérer les textes à la place des ID
     $sql = "SELECT 
-                s.id_station AS id,
+                s.id AS id,
                 s.nom_enseigne AS nom_station,
                 s.adresse_station AS adresse,
                 ca.libelle AS acces,
