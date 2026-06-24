@@ -44,7 +44,7 @@ def main():
     # 4. Inférence en lot (Batch prediction) - Prend quelques millisecondes pour nos 3915 lignes
     try :
         X_scaled = scaler.transform(X)
-        predictions = kmeans_model.predict(X)
+        predictions = kmeans_model.predict(X_scaled)
         # On ajoute les prédictions comme une nouvelle clé dans nos dictionnaires d'origine
         for i, point in enumerate(points):
             point['cluster'] = int(predictions[i])
@@ -52,7 +52,7 @@ def main():
             # Debug
             point['scaled_lat'] = float(X_scaled[i][0])
             point['scaled_lon'] = float(X_scaled[i][1])
-            
+
             point['lat'] = float(point.pop('latitude'))
             point['lon'] = float(point.pop('longitude'))
     except Exception as e:
