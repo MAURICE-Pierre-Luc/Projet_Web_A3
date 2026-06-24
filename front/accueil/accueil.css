@@ -131,7 +131,7 @@ body {
 }
 
 .card:hover{
-  background-color: #4C70B5;
+  background-color: rgba(255, 255, 255, 0.18);
 }
 
 .card-title {
