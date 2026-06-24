@@ -1,5 +1,3 @@
-
-
 /* ------ État global ------ */
 let tousLesPoints   = [];   // données brutes reçues du PHP
 let pointsFiltres   = [];   // données après filtre/recherche
@@ -10,18 +8,14 @@ let carteInitialisee  = false;
 let instanceCarte     = null;
 let idSelectionne     = null;
 
-/* ------ Couleurs des clusters pour la carte ------ */
-const COULEURS_CLUSTER = ["#e74c3c", "#3498db", "#2ecc71", "#f39c12", "#9b59b6", "#1abc9c"];
-
 /* ============================================================
    INITIALISATION */
 document.addEventListener("DOMContentLoaded", function () {
     chargerPointsDeCharge();
 });
 
-/* 
+/* ============================================================
    ONGLETS — basculer entre Tableau et Carte */
-
 function basculerOnglet(onglet) {
     const vueTableau = document.getElementById("vue-tableau");
     const vueCarte   = document.getElementById("vue-carte");
@@ -47,8 +41,8 @@ function basculerOnglet(onglet) {
     }
 }
 
-/* 
-   TABLEAU — Chargement des données via AJAX */
+/* ============================================================
+   TABLEAU & CARTE — Chargement des données via AJAX */
 function chargerPointsDeCharge() {
     fetch(api_link + "get_visualisation.php")
         .then(function (rep) {
@@ -61,10 +55,14 @@ function chargerPointsDeCharge() {
 
             // Mettre à jour le compteur en haut de page
             document.getElementById("compteurs").textContent =
-                donnees.length.toLocaleString("fr-FR") + " Stations"
-                
+                donnees.length.toLocaleString("fr-FR") + " Stations";
 
             afficherPage(1);
+
+            // Si la carte est ouverte, la remplir immédiatement avec ces données
+            if (carteInitialisee && instanceCarte) {
+                afficherMarqueurs(tousLesPoints);
+            }
         })
         .catch(function (err) {
             console.error("Erreur chargement points de charge :", err);
@@ -75,7 +73,6 @@ function chargerPointsDeCharge() {
 
 /* ============================================================
    TABLEAU — Afficher une page donnée
-   @param {number} page - numéro de page (commence à 1)
 ============================================================ */
 function afficherPage(page) {
     pageCourante = page;
@@ -101,7 +98,7 @@ function afficherPage(page) {
     lignes.forEach(function (pdc) {
         const selectionClass = (pdc.id === idSelectionne) ? " selectionnee" : "";
         html += `
-        <tr class="${selectionClass}" onclick="selectionnerLigne(this, ${pdc.id})">
+        <tr class="${selectionClass}" onclick="selectionnerLigne(this, '${pdc.id}')">
             <td>${pdc.adresse || "—"}</td>
             <td>${pdc.acces || "—"}</td>
             <td>${pdc.type_implantation || "—"}</td>
@@ -127,14 +124,11 @@ function afficherPagination() {
         return;
     }
 
-    // Afficher au maximum 5 numéros de page autour de la page courante
     let html = "";
 
-    // Bouton précédent
     html += `<button class="page-btn fleche" onclick="afficherPage(${pageCourante - 1})"
         ${pageCourante === 1 ? "disabled" : ""}>‹</button>`;
 
-    // Calculer la plage de pages à afficher
     let debut = Math.max(1, pageCourante - 2);
     let fin   = Math.min(totalPages, debut + 4);
     if (fin - debut < 4) debut = Math.max(1, fin - 4);
@@ -144,7 +138,6 @@ function afficherPagination() {
         html += `<button class="page-btn${activeClass}" onclick="afficherPage(${i})">${i}</button>`;
     }
 
-    // Bouton suivant
     html += `<button class="page-btn fleche" onclick="afficherPage(${pageCourante + 1})"
         ${pageCourante === totalPages ? "disabled" : ""}>›</button>`;
 
@@ -161,13 +154,11 @@ function filtrerTableau() {
     pointsFiltres = tousLesPoints.filter(function (pdc) {
         if (!texteRecherche) return true;
 
-        // Si une colonne de filtre est sélectionnée, chercher uniquement dans cette colonne
         if (colonneFiltre) {
             const valeur = String(pdc[colonneFiltre] || "").toLowerCase();
             return valeur.includes(texteRecherche);
         }
 
-        // Sinon, chercher dans toutes les colonnes affichées
         return (
             String(pdc.adresse          || "").toLowerCase().includes(texteRecherche) ||
             String(pdc.acces            || "").toLowerCase().includes(texteRecherche) ||
@@ -181,11 +172,8 @@ function filtrerTableau() {
 
 /* ============================================================
    TABLEAU — Sélection d'une ligne
-   @param {HTMLElement} ligne - la balise <tr> cliquée
-   @param {number} id - identifiant du point de charge
 ============================================================ */
 function selectionnerLigne(ligne, id) {
-    // Retirer la surbrillance de toutes les lignes
     document.querySelectorAll("#corps-tableau tr").forEach(function (l) {
         l.classList.remove("selectionnee");
     });
@@ -205,60 +193,23 @@ function initialiserCarte() {
         maxZoom: 18,
     }).addTo(instanceCarte);
 
-    chargerStations();
+    // On utilise les points déjà récupérés lors du chargement de la page
+    if (tousLesPoints.length > 0) {
+        afficherMarqueurs(tousLesPoints);
+    }
 }
 
 /* ============================================================
-   CARTE — Chargement des stations via AJAX
-============================================================ */
-function chargerStations() {
-    fetch(api_link + "get_visualisation.php")
-        .then(function (rep) {
-            if (!rep.ok) throw new Error("Erreur HTTP " + rep.status);
-            return rep.json();
-        })
-        .then(function (stations) {
-            afficherMarqueurs(stations);
-        })
-        .catch(function (err) {
-            console.error("Erreur chargement stations :", err);
-        });
-}
-
-/* ============================================================
-   CARTE — Ajout des marqueurs avec popups détaillées
-   @param {Array} stations - tableau d'objets JSON
+   CARTE — Ajout des circleMarkers uniformes avec popups
 ============================================================ */
 function afficherMarqueurs(stations) {
     stations.forEach(function (station) {
         if (!station.latitude || !station.longitude) return;
 
-        // Couleur du marqueur selon le cluster (si disponible)
-        const cluster = station.cluster !== undefined ? parseInt(station.cluster) : -1;
-        const couleur = (cluster >= 0) ? COULEURS_CLUSTER[cluster % COULEURS_CLUSTER.length] : "#2D0A6E";
-
-        // Icône circulaire colorée
-        const icone = L.divIcon({
-            className: "",
-            html: `<div style="
-                width: 14px; height: 14px;
-                border-radius: 50%;
-                background-color: ${couleur};
-                border: 2px solid white;
-                box-shadow: 0 1px 4px rgba(0,0,0,0.4);
-            "></div>`,
-            iconSize: [14, 14],
-            iconAnchor: [7, 7],
-        });
-
-        // Contenu de la popup (fidèle à la maquette)
-        const nomCluster = cluster >= 0
-            ? `${cluster} – Résidentiel / Destination`
-            : "Non défini";
-
+        // Contenu de la popup (épuré, sans la notion de Cluster)
         const popupHtml = `
-            <div class="popup-titre">${station.nom_station}</div>
-            <div class="popup-adresse">${station.adresse || ""}</div>
+            <div class="popup-titre">${station.nom_station || "Station"}</div>
+            <div class="popup-adresse">${station.adresse || "—"}</div>
             <div class="popup-ligne">
                 <span class="popup-label">Type</span>
                 <span class="popup-valeur">${station.type_implantation || "—"}</span>
@@ -274,25 +225,27 @@ function afficherMarqueurs(stations) {
             <div class="popup-ligne">
                 <span class="popup-label">Opérateur</span>
                 <span class="popup-valeur operateur">${station.operateur || "—"}</span>
-            </div>
-            <div class="popup-ligne">
-                <span class="popup-label">Cluster</span>
-                <span class="popup-valeur cluster">${nomCluster}</span>
             </div>`;
 
-        L.marker([station.latitude, station.longitude], { icon: icone })
-            .bindPopup(popupHtml)
-            .addTo(instanceCarte);
+        // Utilisation de circleMarker : beaucoup plus rapide à afficher que L.marker
+        L.circleMarker([station.latitude, station.longitude], {
+            radius: 5,             // Taille du cercle
+            fillColor: "#3498db",  // Couleur unie (bleu)
+            color: "#ffffff",      // Contour blanc
+            weight: 1,             // Épaisseur du contour
+            opacity: 1,            // Opacité du contour
+            fillOpacity: 0.8       // Transparence du remplissage
+        })
+        .bindPopup(popupHtml)
+        .addTo(instanceCarte);
     });
 }
 
 /* ============================================================
    NAVIGATION — Vers les pages de prédiction
-   @param {string} cible - "implantation", "clusters" ou "puissance"
 ============================================================ */
 function allerPrediction(cible) {
     if (cible === "clusters") {
-        // Pas besoin de sélection pour les clusters (tous les PDC)
         window.location.href = "../cluster/cluster.html";
         return;
     }
@@ -304,4 +257,3 @@ function allerPrediction(cible) {
 
     window.location.href = "prediction.html?id=" + idSelectionne + "&cible=" + cible;
 }
-
