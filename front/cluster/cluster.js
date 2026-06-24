@@ -62,7 +62,7 @@ function chargerPoints(filtre = "all") {
   const url =
     filtre === "all"
       ? "/back/API/get_cluster.php"
-      : `/back/API/get.php_cluster?cluster=${filtre}`;
+      : `/back/API/get_cluster.php?cluster=${filtre}`;
 
   fetch(url)
     .then((response) => {
