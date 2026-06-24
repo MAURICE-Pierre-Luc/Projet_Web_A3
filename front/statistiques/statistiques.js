@@ -22,7 +22,7 @@ async function GetStationsCount() {
 
 
 async function getData(api_link, args = "?table=station") {
-    let result = await fetch(api_link + args);
+    let result = await fetch(api_link + args, true);
     if (!result.ok) {
         throw new Error("Network response was not ok " + result.statusText);
     }
