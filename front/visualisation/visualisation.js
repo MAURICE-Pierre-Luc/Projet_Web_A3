@@ -53,13 +53,21 @@ async function enrichStationsWithDept(stations) {
         const batch = stations.slice(i, i + BATCH);
         const enriched = await Promise.all(batch.map(async (station) => {
             try {
+                // 1. On demande l'objet 'departement' au lieu de 'codeDepartement'
                 const res = await fetch(
-                    `https://geo.api.gouv.fr/communes?lat=${station.latitude}&lon=${station.longitude}&fields=codeDepartement&format=json`
+                    `https://geo.api.gouv.fr/communes?lat=${station.latitude}&lon=${station.longitude}&fields=departement&format=json`
                 );
                 const data = await res.json();
+                
+                // 2. L'API nous renvoie un objet contenant "code" et "nom"
+                const deptObj = data[0]?.departement;
+                
+                // 3. On formate la chaîne de caractères (ex: "44 - Loire-Atlantique")
+                const affichageDept = deptObj ? `${deptObj.code} - ${deptObj.nom}` : "—";
+
                 return {
                     ...station,
-                    departement: data[0]?.codeDepartement ?? "—"
+                    departement: affichageDept
                 };
             } catch {
                 return { ...station, departement: "—" };
