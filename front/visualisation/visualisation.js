@@ -101,7 +101,7 @@ function afficherPage(page) {
         
         // Un clic sur la ligne ou sur le radio appelle la même fonction
         html += `
-        <tr class="${selectionClass}" onclick="selectionnerLigne('${pdc.id}')">
+        <tr class="${selectionClass}" onclick="selectionnerLigne(this,'${pdc.id}')">
             <td style="text-align: center;">
                 <input type="radio" name="stationRadio" value="${pdc.id}" ${radioChecked} 
                        onclick="event.stopPropagation(); selectionnerLigne('${pdc.id}')">
