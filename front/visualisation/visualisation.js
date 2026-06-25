@@ -262,13 +262,18 @@ function allerPrediction(cible) {
         return;
     }
 
-    // Vérification : si aucun bouton radio / aucune ligne n'a été sélectionné
-    if (!idSelectionne) {
-        // Message d'erreur dynamique selon le bouton cliqué
+    const radioCoche = document.querySelector('input[name="stationRadio"]:checked');
+
+    // S'il n'y a aucun bouton coché
+    if (!radioCoche) {
         const nomCible = (cible === 'implantation') ? "son implantation" : "sa puissance";
         alert(`Veuillez sélectionner une station dans le tableau pour prédire ${nomCible}.`);
         return;
     }
 
-    window.location.href = "prediction.html?id=" + idSelectionne + "&cible=" + cible;
+    // On récupère l'ID directement depuis la valeur du bouton radio
+    const idStation = radioCoche.value;
+    
+    // Redirection =========================(REQUETE A ADAPTER)=====================
+    window.location.href = "prediction.html?id=" + idStation + "&cible=" + cible;
 }
