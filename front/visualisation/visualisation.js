@@ -81,24 +81,31 @@ function afficherPage(page) {
     const fin   = debut + LIGNES_PAR_PAGE;
     const lignes = pointsFiltres.slice(debut, fin);
 
-    // Mettre à jour le compteur de résultats
     document.getElementById("nb-resultats").textContent =
         pointsFiltres.length.toLocaleString("fr-FR") + " résultats";
 
-    // Construire les lignes HTML
     const corps = document.getElementById("corps-tableau");
 
     if (lignes.length === 0) {
-        corps.innerHTML = '<tr><td colspan="6" class="chargement">Aucun résultat trouvé.</td></tr>';
+        // Attention au colspan qui passe de 6 à 7 avec la nouvelle colonne !
+        corps.innerHTML = '<tr><td colspan="7" class="chargement">Aucun résultat trouvé.</td></tr>';
         document.getElementById("pagination").innerHTML = "";
         return;
     }
 
     let html = "";
     lignes.forEach(function (pdc) {
-        const selectionClass = (pdc.id === idSelectionne) ? " selectionnee" : "";
+        const estSelectionne = (pdc.id === idSelectionne);
+        const selectionClass = estSelectionne ? " selectionnee" : "";
+        const radioChecked = estSelectionne ? "checked" : "";
+        
+        // Un clic sur la ligne ou sur le radio appelle la même fonction
         html += `
-        <tr class="${selectionClass}" onclick="selectionnerLigne(this, '${pdc.id}')">
+        <tr class="${selectionClass}" onclick="selectionnerLigne('${pdc.id}')">
+            <td style="text-align: center;">
+                <input type="radio" name="stationRadio" value="${pdc.id}" ${radioChecked} 
+                       onclick="event.stopPropagation(); selectionnerLigne('${pdc.id}')">
+            </td>
             <td>${pdc.adresse || "—"}</td>
             <td>${pdc.acces || "—"}</td>
             <td>${pdc.type_implantation || "—"}</td>
@@ -111,7 +118,6 @@ function afficherPage(page) {
     corps.innerHTML = html;
     afficherPagination();
 }
-
 /* ============================================================
    TABLEAU — Générer la pagination
 ============================================================ */
@@ -174,12 +180,18 @@ function filtrerTableau() {
    TABLEAU — Sélection d'une ligne
 ============================================================ */
 function selectionnerLigne(ligne, id) {
+    idSelectionne = id;
+
     document.querySelectorAll("#corps-tableau tr").forEach(function (l) {
         l.classList.remove("selectionnee");
     });
 
-    ligne.classList.add("selectionnee");
-    idSelectionne = id;
+    //Cocher le bouton radio correspondant et surligner sa ligne
+    const radio = document.querySelector(`input[name="stationRadio"][value="${id}"]`);
+    if (radio) {
+        radio.checked = true;
+        radio.closest("tr").classList.add("selectionnee");
+    }
 }
 
 /* ============================================================
@@ -250,8 +262,11 @@ function allerPrediction(cible) {
         return;
     }
 
+    // Vérification : si aucun bouton radio / aucune ligne n'a été sélectionné
     if (!idSelectionne) {
-        alert("Veuillez sélectionner un point de charge dans le tableau.");
+        // Message d'erreur dynamique selon le bouton cliqué
+        const nomCible = (cible === 'implantation') ? "son implantation" : "sa puissance";
+        alert(`Veuillez sélectionner une station dans le tableau pour prédire ${nomCible}.`);
         return;
     }
 
