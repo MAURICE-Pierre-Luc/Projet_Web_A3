@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&family=Inter:wght@400&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="statistiques.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="../env.js" defer></script>
   <script src="statistiques.js" defer></script>
 </head>
@@ -33,10 +34,7 @@
             <p>Vue nationale - tous les départements</p>
         </div>
 
-        <select class="view-selector">
-            <option>Vue nationale</option>
-            <!-- Il faut ajouter dynamiquement les départements -->
-        </select>
+        <select class="view-selector"id="filterDepartement"></select>
     </div>
 
     <!-- Cartes statistiques -->
@@ -57,7 +55,7 @@
             <h3>Puissance moyenne</h3>
             <span class="value" id="puiss_moy"></span>
             <!-- Il faut ajouter la vraie valeur -->
-            <span class="unit">kW par station</span>
+            <span class="unit">kW</span>
         </div>
 
         <div class="stat-card">
@@ -73,22 +71,30 @@
 
         <div class="chart-card">
             <h3>Répartition par type d'implantation</h3>
-            <div class="chart-placeholder"></div>
+            <div>
+                <canvas id="GrapheTypeImplantation"></canvas>
+            </div>
         </div>
 
         <div class="chart-card">
             <h3>Modalité d'accès à la recharge</h3>
-            <div class="chart-placeholder"></div>
+            <div style="height: 20rem;">
+                <canvas id="GrapheConditionAcces"></canvas>
+            </div>
         </div>
 
         <div class="chart-card">
             <h3>Distribution des puissances nominales</h3>
-            <div class="chart-placeholder"></div>
+            <div style="height: 20rem;">
+                <canvas id="GraphePuissances"></canvas>
+            </div>
         </div>
 
         <div class="chart-card">
             <h3>Répartition des clusters IA</h3>
-            <div class="chart-placeholder"></div>
+            <div>
+                <canvas id="GrapheAccessibilitePMR"></canvas>
+            </div>
         </div>
 
     </section>

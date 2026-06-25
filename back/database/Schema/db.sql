@@ -137,14 +137,14 @@ INSERT INTO type_prise (libelle) VALUES
     ('Autre');
 
 INSERT INTO condition_acces (libelle) VALUES
-    ('Accès libre'),
-    ('Accès réservé');
+    ('Acces libre'),
+    ('Acces reserve');
 
 INSERT INTO accessibilite_pmr (libelle) VALUES
-    ('Accessible mais non réservé PMR'),
-    ('Accessibilité inconnue'),
+    ('Accessible mais non reserve PMR'),
+    ('Accessibilite inconnue'),
     ('Non accessible'),
-    ('Réservé PMR');
+    ('Reserve PMR');
 
 INSERT INTO restriction_gabarit (libelle) VALUES
     ('aucune'),
@@ -156,6 +156,6 @@ INSERT INTO restriction_gabarit (libelle) VALUES
 
 INSERT INTO implantation (libelle) VALUES
     ('Parking public'),
-    ('Parking privé à usage public'),
+    ('Parking prive a usage public'),
     ('Voirie'),
-    ('Parking privé réservé à la clientèle');
+    ('Parking prive reserve a la clientele');
