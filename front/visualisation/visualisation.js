@@ -41,34 +41,82 @@ function basculerOnglet(onglet) {
     }
 }
 
+
+/* ============================================================
+   UTILITAIRE — Enrichissement via API Gouv (Code repris de Pierre-Luc)
+============================================================ */
+async function enrichStationsWithDept(stations) {
+    const BATCH = 100;
+    const result = [];
+
+    for (let i = 0; i < stations.length; i += BATCH) {
+        const batch = stations.slice(i, i + BATCH);
+        const enriched = await Promise.all(batch.map(async (station) => {
+            try {
+                // 1. On demande l'objet 'departement' au lieu de 'codeDepartement'
+                const res = await fetch(
+                    `https://geo.api.gouv.fr/communes?lat=${station.latitude}&lon=${station.longitude}&fields=departement&format=json`
+                );
+                const data = await res.json();
+                
+                // 2. L'API nous renvoie un objet contenant "code" et "nom"
+                const deptObj = data[0]?.departement;
+                
+                // 3. On formate la chaîne de caractères (ex: "44 - Loire-Atlantique")
+                const affichageDept = deptObj ? `${deptObj.code} - ${deptObj.nom}` : "—";
+
+                return {
+                    ...station,
+                    departement: affichageDept
+                };
+            } catch {
+                return { ...station, departement: "—" };
+            }
+        }));
+        result.push(...enriched);
+    }
+
+    return result;
+}
+
 /* ============================================================
    TABLEAU & CARTE — Chargement des données via AJAX */
-function chargerPointsDeCharge() {
-    fetch(api_link + "get_visualisation.php")
-        .then(function (rep) {
-            if (!rep.ok) throw new Error("Erreur HTTP " + rep.status);
-            return rep.json();
-        })
-        .then(function (donnees) {
-            tousLesPoints  = donnees;
-            pointsFiltres  = donnees;
+async function chargerPointsDeCharge() {
+    const corpsTableau = document.getElementById("corps-tableau");
+    
+    // 1. Message d'attente explicite pendant les requêtes de l'API Gouv
+    corpsTableau.innerHTML = '<tr><td colspan="7" class="chargement">Récupération des départements en cours... Veuillez patienter.</td></tr>';
 
-            // Mettre à jour le compteur en haut de page
-            document.getElementById("compteurs").textContent =
-                donnees.length.toLocaleString("fr-FR") + " Stations";
+    try {
+        // 2. On récupère nos données brutes depuis notre PHP
+        const rep = await fetch(api_link + "get_visualisation.php");
+        if (!rep.ok) throw new Error("Erreur HTTP " + rep.status);
+        const donneesBrutes = await rep.json();
 
-            afficherPage(1);
+        // 3. On enrichit avec l'API Gouv 
+        const donneesEnrichies = await enrichStationsWithDept(donneesBrutes);
 
-            // Si la carte est ouverte, la remplir immédiatement avec ces données
-            if (carteInitialisee && instanceCarte) {
-                afficherMarqueurs(tousLesPoints);
-            }
-        })
-        .catch(function (err) {
-            console.error("Erreur chargement points de charge :", err);
-            document.getElementById("corps-tableau").innerHTML =
-                '<tr><td colspan="6" class="chargement">Impossible de charger les données.</td></tr>';
-        });
+        // 4. On stocke le résultat final
+        tousLesPoints = donneesEnrichies;
+        pointsFiltres = donneesEnrichies;
+
+        // Mise à jour du compteur
+        document.getElementById("compteurs").textContent =
+            donneesEnrichies.length.toLocaleString("fr-FR") + " Stations";
+
+        // 5. On affiche enfin le tableau
+        afficherPage(1);
+
+        // Et la carte si elle est ouverte
+        if (carteInitialisee && instanceCarte) {
+            afficherMarqueurs(tousLesPoints);
+        }
+
+    } catch (err) {
+        console.error("Erreur chargement via API :", err);
+        corpsTableau.innerHTML =
+            '<tr><td colspan="7" class="chargement">Impossible de charger les données.</td></tr>';
+    }
 }
 
 /* ============================================================
@@ -106,7 +154,7 @@ function afficherPage(page) {
                 <input type="radio" name="stationRadio" value="${pdc.id}" ${radioChecked} 
                        onclick="event.stopPropagation(); selectionnerLigne('${pdc.id}')">
             </td>
-            <td>${pdc.adresse || "—"}</td>
+            <td>${pdc.departement || "—"}</td>
             <td>${pdc.acces || "—"}</td>
             <td>${pdc.type_implantation || "—"}</td>
             <td>${pdc.puissance_nominale || "—"}</td>
