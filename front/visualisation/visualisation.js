@@ -208,21 +208,97 @@ function filtrerTableau() {
     pointsFiltres = tousLesPoints.filter(function (pdc) {
         if (!texteRecherche) return true;
 
+        // Recherche ciblée sur un filtre précis
         if (colonneFiltre) {
             const valeur = String(pdc[colonneFiltre] || "").toLowerCase();
             return valeur.includes(texteRecherche);
         }
 
+        // Recherche globale par défaut
         return (
-            String(pdc.adresse          || "").toLowerCase().includes(texteRecherche) ||
-            String(pdc.acces            || "").toLowerCase().includes(texteRecherche) ||
-            String(pdc.type_implantation|| "").toLowerCase().includes(texteRecherche) ||
-            String(pdc.operateur        || "").toLowerCase().includes(texteRecherche)
+            String(pdc.departement       || "").toLowerCase().includes(texteRecherche) ||
+            String(pdc.acces             || "").toLowerCase().includes(texteRecherche) ||
+            String(pdc.type_implantation || "").toLowerCase().includes(texteRecherche) ||
+            String(pdc.operateur         || "").toLowerCase().includes(texteRecherche)
         );
     });
 
     afficherPage(1);
 }
+
+/* ============================================================
+   AUTOCOMPLETE — Gestion de la complétion automatique
+============================================================ */
+function gererAutocomplete() {
+    const input = document.getElementById("input-recherche");
+    const texte = input.value.toLowerCase().trim();
+    const liste = document.getElementById("autocomplete-liste");
+    const colonneFiltre = document.getElementById("select-filtre").value;
+
+    // 1. Filtrer le tableau en temps réel
+    filtrerTableau();
+
+    // 2. Cacher l'autocomplete si la saisie est trop courte
+    if (texte.length < 2) {
+        liste.innerHTML = "";
+        liste.classList.add("cache");
+        return;
+    }
+
+    // 3. Collecter les suggestions uniques
+    const suggestionsUniques = new Set();
+
+    tousLesPoints.forEach(function (pdc) {
+        if (colonneFiltre) {
+            const valeur = pdc[colonneFiltre];
+            if (valeur && String(valeur).toLowerCase().includes(texte)) {
+                suggestionsUniques.add(String(valeur));
+            }
+        } else {
+            const champs = ["departement", "acces", "type_implantation", "operateur"];
+            champs.forEach(function (champ) {
+                const valeur = pdc[champ];
+                if (valeur && String(valeur).toLowerCase().includes(texte)) {
+                    suggestionsUniques.add(String(valeur));
+                }
+            });
+        }
+    });
+
+    // 4. Limiter à 8 résultats pour ne pas surcharger l'écran
+    const propositions = Array.from(suggestionsUniques).slice(0, 8);
+
+    if (propositions.length === 0) {
+        liste.innerHTML = "";
+        liste.classList.add("cache");
+        return;
+    }
+
+    // 5. Construire le HTML des suggestions
+    let html = "";
+    propositions.forEach(function (prop) {
+        const propEchappee = prop.replace(/'/g, "\\'");
+        html += `<div class="autocomplete-suggestion" onclick="selectionnerSuggestion('${propEchappee}')">${prop}</div>`;
+    });
+
+    liste.innerHTML = html;
+    liste.classList.remove("cache");
+}
+
+/* AUTOCOMPLETE — Clic sur une suggestion */
+function selectionnerSuggestion(valeur) {
+    const input = document.getElementById("input-recherche");
+    input.value = valeur; 
+
+    const liste = document.getElementById("autocomplete-liste");
+    liste.innerHTML = "";
+    liste.classList.add("cache"); 
+
+    // On applique le filtre final avec le mot complet
+    filtrerTableau();
+}
+
+
 
 /* ============================================================
    TABLEAU — Sélection d'une ligne
@@ -258,6 +334,16 @@ function initialiserCarte() {
         afficherMarqueurs(tousLesPoints);
     }
 }
+
+/* AUTOCOMPLETE — Fermer au clic ailleurs */
+document.addEventListener("click", function (evenement) {
+    const liste = document.getElementById("autocomplete-liste");
+    const input = document.getElementById("input-recherche");
+    
+    if (liste && evenement.target !== input && !liste.contains(evenement.target)) {
+        liste.classList.add("cache");
+    }
+});
 
 /* ============================================================
    CARTE — Ajout des circleMarkers uniformes avec popups

@@ -172,6 +172,43 @@ h1 {
     color: #333;
 }
 
+/* Conteneur des suggestions */
+.autocomplete-suggestions {
+    position: absolute;
+    top: 100%; /* Se place pile sous l'input */
+    left: 0;
+    width: 100%;
+    max-height: 220px; /* Évite que la liste soit trop longue */
+    overflow-y: auto;  /* Ajoute un scrollbar si besoin */
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000; /* Passe au-dessus du tableau */
+}
+
+/* Chaque ligne de suggestion */
+.autocomplete-suggestion {
+    padding: 10px 12px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    text-align: left;
+    transition: background-color 0.2s;
+}
+
+/* Effet au survol */
+.autocomplete-suggestion:hover {
+    background-color: #f5f5f5;
+    color: #000;
+}
+
+/* Classe utilitaire si pas déjà présente */
+.cache {
+    display: none !important;
+}
+
 /* ======= TABLEAU ======= */
 .table-wrapper {
     background: white;
