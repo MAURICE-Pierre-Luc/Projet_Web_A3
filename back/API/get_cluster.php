@@ -5,10 +5,26 @@
 
 header("Content-Type: application/json; charset=utf-8");
 
-$db_host = "localhost";
-$db_name = "fallie28";
-$db_user = "fallie28";
-$db_pass = "OfO4xqpiSVGo8ua8";
+// 1. Définir le chemin vers le fichier .env
+// __DIR__ représente le dossier actuel (back/API). On remonte d'un cran (../) pour trouver le .env
+$envPath = __DIR__ . '/../database/.env';
+
+// 2. Lire le fichier .env
+if (!file_exists($envPath)) {
+    http_response_code(500);
+    echo json_encode(["error" => "Erreur critique : Fichier d'environnement introuvable.",
+    "chemin_fouillé_par_php" => $envPath,]);
+    
+    exit;
+}
+
+$env = parse_ini_file($envPath);
+
+// 3. Récupérer les variables
+$db_host = $env['DB_HOST'];
+$db_name = $env['DB_NAME'];
+$db_user = $env['DB_USER'];
+$db_pass = $env['DB_PASSWORD'];
 
 $python_dir = __DIR__ . "/../scripts/";          
 $script     = $python_dir . "script_cluster.py"; 
