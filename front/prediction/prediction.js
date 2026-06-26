@@ -7,80 +7,65 @@
    ============================================================ */
 
 document.addEventListener("DOMContentLoaded", function () {
-    // 1. Récupérer l'ID du point de charge dans l'URL (ex: prediction.html?id=123)
     const params = new URLSearchParams(window.location.search);
     const idPdc = params.get("id");
 
     if (!idPdc) {
-        console.error("Aucun identifiant de point de charge fourni dans l'URL.");
         alert("Erreur : Aucun point de charge n'a été sélectionné.");
         return;
     }
 
-    // 2. Charger les prédictions depuis le PHP
+    // On n'envoie que l'ID !
     chargerPrevisions(idPdc);
 });
 
-/* Appel AJAX pour récupérer les données de prédiction
-   @param {string} id - L'identifiant du point de charge
-*/
+/* ============================================================
+   Appel AJAX
+============================================================ */
 function chargerPrevisions(id) {
-    // Ajuste le chemin vers ton script PHP si nécessaire
-    fetch(`php/get_prediction.php?id=${id}`)
+    // L'URL magique attendue par ton collègue
+    const urlFetch = `${api_link}predictions.php?table=station&id=${id}`;
+
+    fetch(urlFetch)
         .then(function (response) {
             if (!response.ok) throw new Error("Erreur HTTP " + response.status);
             return response.json();
         })
-        .then(function (data) {
-            // data doit contenir : type_predit, probabilite_type, puissance_predite, probabilite_puissance
-            mettreAJourInterface(data);
+        .then(function (json) {
+            if (json.status === 'success') {
+                // On passe les données de la station (json.data) à l'interface
+                mettreAJourInterface(json.data);
+            } else {
+                console.error("Erreur PHP :", json.message);
+            }
         })
         .catch(function (error) {
             console.error("Erreur lors de la récupération des prédictions :", error);
-            // Optionnel : Afficher un message d'erreur visuel dans les cartes
         });
 }
 
-/* Met à jour les éléments HTML avec les résultats du modèle
-   @param {Object} donnees - Les prédictions renvoyées par le serveur
-*/
+/* ============================================================
+   Mise à jour de l'interface
+============================================================ */
 function mettreAJourInterface(donnees) {
+    // Attention : on utilise les noms des colonnes de la BDD telles que renvoyées par le PHP
+
     // --- 1. Bloc Type d'implantation ---
-    if (donnees.type_predit) {
-        // Libellé du type (ex: "Parking public")
-        document.querySelector(".card:nth-child(1) .card-value").textContent = donnees.type_predit;
-        
-        // Indice "Fra..." ou département si tu veux le dynamiser (optionnel)
-        if (donnees.commune_prefixe) {
-            document.querySelector(".card:nth-child(1) .card-hint").textContent = donnees.commune_prefixe;
-        }
+    // Si l'IA a fait une prédiction, elle a remplacé la valeur null par un texte (ex: "Parking public")
+    if (donnees.id_implantation) {
+        document.querySelector(".card:nth-child(1) .card-value").textContent = donnees.id_implantation;
+    } else {
+        document.querySelector(".card:nth-child(1) .card-value").textContent = "Non défini";
     }
     
-    if (donnees.probabilite_type) {
-        const probaType = parseInt(donnees.probabilite_type);
-        // Badge de pourcentage
-        document.querySelector(".badge-blue").textContent = probaType + "%";
-        // Largeur de la barre de progression
-        document.querySelector(".bg-blue").style.width = probaType + "%";
+    // --- 2. Bloc Puissance nominale ---
+    // Pareil, l'IA remplit la colonne puissance_max_kw si elle était nulle
+    if (donnees.puissance_max_kw) {
+        document.querySelector(".card:nth-child(2) .card-value").textContent = donnees.puissance_max_kw + " kW";
+    } else {
+        document.querySelector(".card:nth-child(2) .card-value").textContent = "Non défini";
     }
 
-    // --- 2. Bloc Puissance nominale ---
-    if (donnees.puissance_predite) {
-        // Valeur de la puissance (ex: "22 kW")
-        document.querySelector(".card:nth-child(2) .card-value").textContent = donnees.puissance_predite + " kW";
-        
-        if (donnees.commune_prefixe) {
-            document.querySelector(".card:nth-child(2) .card-hint").textContent = donnees.commune_prefixe;
-        }
-    }
-    
-    if (donnees.probabilite_puissance) {
-        const probaPuissance = parseInt(donnees.probabilite_puissance);
-        // Badge de pourcentage
-        document.querySelector(".badge-green").textContent = probaPuissance + "%";
-        // Largeur de la barre de progression
-        document.querySelector(".bg-green").style.width = probaPuissance + "%";
-    }
 }
 
 
