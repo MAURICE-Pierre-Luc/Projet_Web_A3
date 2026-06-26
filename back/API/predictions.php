@@ -7,7 +7,7 @@ header('Content-Type: application/json');
 if (!isset($_GET['table']) || !isset($databaseTables[$_GET['table']])) { //If the table is missing/invalid, we can't do anything
     echo json_encode([
         'status' => 'error',
-        'message' => 'Paramètre table manquant ou invalide Est-ce que la table est définie dans la conn?'
+        'message' => 'Paramètre table manquant ou invalide (Est-ce que la table est définie dans la conn?)'
     ]);
     exit;
 }
@@ -107,7 +107,7 @@ function prediction(array $data): array {
     if ($data['cible'] === 'implantation') {
         return ['resultat' => predictImplantation($data['info'])];
     } elseif ($data['cible'] === 'puissance') {
-        return ['resultat' => predictPuissance($data['info'], )];
+        return ['resultat' => predictPuissance($data['info'])];
     }
 
     throw new InvalidArgumentException("Cible inconnue : " . $data['cible']);
@@ -137,8 +137,10 @@ function predictImplantation(array $data): string {
 
     // Construit "mo 08:00-20:00, tu 08:00-20:00, ..."
     $horairesStr = implode(', ', array_map(
-        fn($r) => $r['jour'] . ' ' . $r['heure_debut'] . '-' . $r['heure_fin'],
-        $rows
+        function ($r) {
+            return $r['jour'] . ' ' . $r['heure_debut'] . '-' . $r['heure_fin'];
+        },
+        $rowss
     ));
 
     // --- Résolution raccordement ---
@@ -195,7 +197,7 @@ function predictImplantation(array $data): string {
 
 function predictPuissance(array $data): float {
 
-    global $conn
+    global $conn;
 
     // --- Résolution des FK ---
     $operateur = $pdo->prepare("SELECT nom FROM OPERATEUR WHERE id = ?");
