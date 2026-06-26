@@ -54,7 +54,7 @@ async function mettreAJourInterface(donnees) {
     // Si l'IA a fait une prédiction, elle a remplacé la valeur null par un texte (ex: "Parking public")
     if (donnees.id_implantation) {
 
-        let implantation = await getData(api_link + "request.php", "?table=implantation&id="+donnees.id_implantation, true );
+        let implantation = await getData(api_link + "request.php", "?table=implantation&id="+donnees.id_implantation);
         implantation = implantation.libelle
         document.querySelector(".card:nth-child(1) .card-value").textContent = implantation;
     } else {
