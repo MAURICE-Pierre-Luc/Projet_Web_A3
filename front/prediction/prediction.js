@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
     }
 
-    // On n'envoie que l'ID !
+    // On n'envoie que l'ID 
     chargerPrevisions(idPdc);
 });
 
@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", function () {
    Appel AJAX
 ============================================================ */
 function chargerPrevisions(id) {
-    // L'URL magique attendue par ton collègue
+ 
     const urlFetch = `${api_link}predictions.php?table=station&id=${id}`;
 
     fetch(urlFetch)
@@ -48,7 +48,7 @@ function chargerPrevisions(id) {
    Mise à jour de l'interface
 ============================================================ */
 function mettreAJourInterface(donnees) {
-    // Attention : on utilise les noms des colonnes de la BDD telles que renvoyées par le PHP
+    // on utilise les noms des colonnes de la BDD telles que renvoyées par le PHP
 
     // --- 1. Bloc Type d'implantation ---
     // Si l'IA a fait une prédiction, elle a remplacé la valeur null par un texte (ex: "Parking public")
