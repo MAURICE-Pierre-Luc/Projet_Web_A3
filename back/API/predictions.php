@@ -7,7 +7,7 @@ header('Content-Type: application/json');
 if (!isset($_GET['table']) || !isset($databaseTables[$_GET['table']])) { //If the table is missing/invalid, we can't do anything
     echo json_encode([
         'status' => 'error',
-        'message' => 'Paramètre table manquant ou invalide (Est-ce que la table est définie dans la conn?)'
+        'message' => 'Paramètre table manquant ou invalide Est-ce que la table est définie dans la conn?'
     ]);
     exit;
 }
