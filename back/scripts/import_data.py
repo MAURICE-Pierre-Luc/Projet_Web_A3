@@ -19,7 +19,20 @@ csv_path = "../../IRVE_clean_web.csv"
 
 df = pd.read_csv(csv_path, encoding="UTF-8")
 
-columns_to_keep = ["nom_operateur","contact_operateur","telephone_operateur","nom_enseigne","id_station_itinerance","implantation_station","adresse_station","coordonneesXY","nbre_pdc","puissance_nominale","prise_type_ef","prise_type_2","prise_type_combo_ccs","prise_type_chademo","prise_type_autre", "tarification_eur_kWh","condition_acces","horaires","accessibilite_pmr","restriction_gabarit","date_mise_en_service"]
+columns_to_keep = [
+    "nom_operateur", "contact_operateur", "telephone_operateur",
+    "nom_enseigne", "id_station_itinerance", "implantation_station",
+    "adresse_station", "coordonneesXY", "nbre_pdc", "puissance_nominale",
+    "prise_type_ef", "prise_type_2", "prise_type_combo_ccs",
+    "prise_type_chademo", "prise_type_autre",
+    "tarification_eur_kWh", "condition_acces", "horaires",
+    "accessibilite_pmr", "restriction_gabarit", "date_mise_en_service",
+    "reservation",
+    "cable_t2_attache", "paiement_acte", "paiement_cb", "paiement_autre",
+    "raccordement",
+]
+
+columns_to_keep = [c for c in columns_to_keep if c in df.columns]
 
 df = df[columns_to_keep]
 
@@ -27,10 +40,17 @@ DAYS_ORDER = ["mo", "tu", "we", "th", "fr", "sa", "su"]
 
 
 def remove_accents(value):
-    """Supprime les accents d'une chaîne de caractères."""
     if not isinstance(value, str):
         return value
     return unicodedata.normalize("NFD", value).encode("ascii", "ignore").decode("ascii")
+
+
+def to_bool(value):
+    if value is None:
+        return False
+    if isinstance(value, bool):
+        return value
+    return str(value).strip().upper() in ("TRUE", "1", "OUI", "YES")
 
 
 def expand_days(day_part):
@@ -75,11 +95,11 @@ def parse_line(line):
 
 df["horaires"] = df["horaires"].map(parse_line)
 
-# Suppression des accents sur toutes les colonnes texte
 text_columns = [
     "nom_operateur", "contact_operateur", "telephone_operateur",
     "nom_enseigne", "implantation_station", "adresse_station",
     "condition_acces", "accessibilite_pmr", "restriction_gabarit",
+    "raccordement",
 ]
 for col in text_columns:
     if col in df.columns:
@@ -88,23 +108,24 @@ for col in text_columns:
 
 conn = mysql.connector.connect(**DB_CONFIG)
 cursor = conn.cursor()
- 
+
 cursor.execute("SHOW TABLES")
 tables_existantes = {t[0].lower() for t in cursor.fetchall()}
 tables_attendues  = {
     "station", "operateur", "horaire", "station_horaire",
     "type_prise", "station_prise", "condition_acces",
-    "restriction_gabarit", "accessibilite_pmr", "implantation"
+    "restriction_gabarit", "accessibilite_pmr", "implantation",
+    "raccordement",
 }
 manquantes = tables_attendues - tables_existantes
 if manquantes:
     raise RuntimeError(f"Tables manquantes dans la BD : {manquantes}")
- 
+
 df = df.replace("inconnu", None)
 
 
 enum_cache = {}
- 
+
 def get_or_create(table, libelle):
     if libelle is None:
         return None
@@ -123,7 +144,7 @@ def get_or_create(table, libelle):
 
 
 operateur_cache = {}
- 
+
 def get_or_create_operateur(nom, contact, telephone):
     if nom is None:
         return None
@@ -146,7 +167,7 @@ def get_or_create_operateur(nom, contact, telephone):
 
 
 horaire_cache = {}
- 
+
 def get_or_create_horaire(jour, heure_debut, heure_fin):
     key = (jour, heure_debut, heure_fin)
     if key in horaire_cache:
@@ -177,20 +198,21 @@ PRISES = {
 
 
 for _, row in df.iterrows():
- 
+
     # -- Opérateur --
     id_operateur = get_or_create_operateur(
         row.get("nom_operateur"),
         row.get("contact_operateur"),
         row.get("telephone_operateur"),
     )
- 
+
     # -- Tables enum --
     id_condition_acces     = get_or_create("condition_acces",     row.get("condition_acces"))
     id_restriction_gabarit = get_or_create("restriction_gabarit", row.get("restriction_gabarit"))
     id_accessibilite_pmr   = get_or_create("accessibilite_pmr",   row.get("accessibilite_pmr"))
     id_implantation        = get_or_create("implantation",        row.get("implantation_station"))
- 
+    id_raccordement        = get_or_create("raccordement",        row.get("raccordement"))
+
     # -- Coordonnées --
     longitude, latitude = None, None
     if row.get("coordonneesXY"):
@@ -199,23 +221,32 @@ for _, row in df.iterrows():
             longitude, latitude = coords[0], coords[1]
         except Exception:
             pass
- 
+
     # -- Date --
     date_mise_en_service = row.get("date_mise_en_service") or None
 
-    # -- Champs texte de la station --
+    # -- Champs texte --
     nom_enseigne    = remove_accents(row.get("nom_enseigne"))
     adresse_station = remove_accents(row.get("adresse_station"))
- 
+
+    # -- Champs booléens --
+    reservation      = to_bool(row.get("reservation"))
+    cable_t2_attache = to_bool(row.get("cable_t2_attache"))
+    paiement_acte    = to_bool(row.get("paiement_acte"))
+    paiement_cb      = to_bool(row.get("paiement_cb"))
+    paiement_autre   = to_bool(row.get("paiement_autre"))
+
     # -- Station --
     cursor.execute("""
         INSERT INTO station (
             id, nom_enseigne, adresse_station,
             longitude, latitude, tarif_eur_kwh, puissance_max_kw,
-            nbre_pdc, reservation, date_mise_en_service,
+            nbre_pdc, reservation,
+            cable_t2_attache, paiement_acte, paiement_cb, paiement_autre,
+            date_mise_en_service,
             id_operateur, id_condition_acces, id_restriction_gabarit,
-            id_accessibilite_pmr, id_implantation
-        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            id_accessibilite_pmr, id_implantation, id_raccordement
+        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         ON DUPLICATE KEY UPDATE id = id
     """, (
         row["id_station_itinerance"],
@@ -226,17 +257,22 @@ for _, row in df.iterrows():
         row.get("tarification_eur_kWh"),
         row.get("puissance_nominale"),
         row.get("nbre_pdc"),
-        False,
+        reservation,
+        cable_t2_attache,
+        paiement_acte,
+        paiement_cb,
+        paiement_autre,
         date_mise_en_service,
         id_operateur,
         id_condition_acces,
         id_restriction_gabarit,
         id_accessibilite_pmr,
         id_implantation,
+        id_raccordement,
     ))
- 
+
     id_station = row["id_station_itinerance"]
- 
+
     # -- Types de prise --
     for col, libelle in PRISES.items():
         valeur = row.get(col)
@@ -246,7 +282,7 @@ for _, row in df.iterrows():
                 INSERT IGNORE INTO station_prise (id_station, id_type_prise)
                 VALUES (%s, %s)
             """, (id_station, id_type_prise))
- 
+
     # -- Horaires --
     horaires_raw = row.get("horaires")
     if horaires_raw:

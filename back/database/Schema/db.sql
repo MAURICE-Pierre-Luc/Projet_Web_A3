@@ -30,6 +30,11 @@ CREATE TABLE restriction_gabarit (
     libelle VARCHAR(100) NOT NULL
 );
 
+CREATE TABLE raccordement (
+    id      INT AUTO_INCREMENT PRIMARY KEY,
+    libelle VARCHAR(100) NOT NULL
+);
+
 
 CREATE TABLE station (
     id                     VARCHAR(50)    PRIMARY KEY,
@@ -41,12 +46,17 @@ CREATE TABLE station (
     puissance_max_kw       DECIMAL(6, 1),
     nbre_pdc               INT            NOT NULL DEFAULT 1,
     reservation            BOOLEAN        NOT NULL DEFAULT FALSE,
+    cable_t2_attache       BOOLEAN        NOT NULL DEFAULT FALSE,
+    paiement_acte          BOOLEAN        NOT NULL DEFAULT FALSE,
+    paiement_cb            BOOLEAN        NOT NULL DEFAULT FALSE,
+    paiement_autre         BOOLEAN        NOT NULL DEFAULT FALSE,
     date_mise_en_service   DATE,
     id_operateur           INT,
     id_condition_acces     INT,
     id_restriction_gabarit INT,
     id_accessibilite_pmr   INT,
     id_implantation        INT,
+    id_raccordement        INT,
 
     CONSTRAINT fk_station_operateur
         FOREIGN KEY (id_operateur)
@@ -71,6 +81,11 @@ CREATE TABLE station (
     CONSTRAINT fk_station_implantation
         FOREIGN KEY (id_implantation)
         REFERENCES implantation(id)
+        ON DELETE SET NULL,
+
+    CONSTRAINT fk_station_raccordement
+        FOREIGN KEY (id_raccordement)
+        REFERENCES raccordement(id)
         ON DELETE SET NULL
 );
 
@@ -129,6 +144,8 @@ CREATE TABLE utilisateur (
 );
 
 
+-- Données de référence
+
 INSERT INTO type_prise (libelle) VALUES
     ('EF'),
     ('Type 2'),
@@ -159,3 +176,8 @@ INSERT INTO implantation (libelle) VALUES
     ('Parking prive a usage public'),
     ('Voirie'),
     ('Parking prive reserve a la clientele');
+
+INSERT INTO raccordement (libelle) VALUES
+    ('Direct'),
+    ('Indirecte'),
+    ('Inconnu');
