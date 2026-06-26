@@ -47,13 +47,16 @@ function chargerPrevisions(id) {
 /* ============================================================
    Mise à jour de l'interface
 ============================================================ */
-function mettreAJourInterface(donnees) {
+async function mettreAJourInterface(donnees) {
     // Attention : on utilise les noms des colonnes de la BDD telles que renvoyées par le PHP
 
     // --- 1. Bloc Type d'implantation ---
     // Si l'IA a fait une prédiction, elle a remplacé la valeur null par un texte (ex: "Parking public")
     if (donnees.id_implantation) {
-        document.querySelector(".card:nth-child(1) .card-value").textContent = donnees.id_implantation;
+
+        let implantation = await getData(api_link + "request.php", "?table=implantation&id="+donnees.id_implantation, true );
+        implantation = implantation.libelle
+        document.querySelector(".card:nth-child(1) .card-value").textContent = implantation;
     } else {
         document.querySelector(".card:nth-child(1) .card-value").textContent = "Non défini";
     }
@@ -70,3 +73,19 @@ function mettreAJourInterface(donnees) {
 
 
 
+
+async function getData(url, args = "?table=station", details = false) {
+    const res = await fetch(url + args);
+
+    if (!res.ok) throw new Error("Network error: " + res.statusText);
+
+    if(details){
+        console.log(res)
+    }
+
+    const result = JSON.parse(await res.text());
+
+    if (!result?.data) throw new Error("Invalid data format");
+
+    return result.data;
+}
