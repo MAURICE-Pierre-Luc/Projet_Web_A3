@@ -1,4 +1,4 @@
-/* ------ État global ------ */
+
 let tousLesPoints   = [];   // données brutes reçues du PHP
 let pointsFiltres   = [];   // données après filtre/recherche
 let pageCourante    = 1;
@@ -135,7 +135,6 @@ function afficherPage(page) {
     const corps = document.getElementById("corps-tableau");
 
     if (lignes.length === 0) {
-        // Attention au colspan qui passe de 6 à 7 avec la nouvelle colonne !
         corps.innerHTML = '<tr><td colspan="7" class="chargement">Aucun résultat trouvé.</td></tr>';
         document.getElementById("pagination").innerHTML = "";
         return;
@@ -235,17 +234,17 @@ function gererAutocomplete() {
     const liste = document.getElementById("autocomplete-liste");
     const colonneFiltre = document.getElementById("select-filtre").value;
 
-    // 1. Filtrer le tableau en temps réel
+    //Filtrer le tableau en temps réel
     filtrerTableau();
 
-    // 2. Cacher l'autocomplete si la saisie est trop courte
+    //Cacher l'autocomplete si la saisie est trop courte
     if (texte.length < 2) {
         liste.innerHTML = "";
         liste.classList.add("cache");
         return;
     }
 
-    // 3. Collecter les suggestions uniques
+    //Collecter les suggestions uniques
     const suggestionsUniques = new Set();
 
     tousLesPoints.forEach(function (pdc) {
@@ -265,7 +264,7 @@ function gererAutocomplete() {
         }
     });
 
-    // 4. Limiter à 8 résultats pour ne pas surcharger l'écran
+    //Limiter à 8 résultats pour ne pas surcharger l'écran
     const propositions = Array.from(suggestionsUniques).slice(0, 8);
 
     if (propositions.length === 0) {
@@ -274,7 +273,7 @@ function gererAutocomplete() {
         return;
     }
 
-    // 5. Construire le HTML des suggestions
+    //Construire le HTML des suggestions
     let html = "";
     propositions.forEach(function (prop) {
         const propEchappee = prop.replace(/'/g, "\\'");
@@ -408,6 +407,6 @@ function allerPrediction(cible) {
     // On récupère l'ID directement depuis la valeur du bouton radio
     const idStation = radioCoche.value;
     
-    // Redirection =========================(REQUETE A ADAPTER)=====================
-    window.location.href = "prediction.html?id=" + idStation + "&cible=" + cible;
+    // Redirection 
+    window.location.href = "../prediction/prediction.html?id=" + idStation + "&cible=" + cible;
 }
